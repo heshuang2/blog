@@ -1,0 +1,315 @@
+body,
+html {
+    /* height: 100%; */
+    box-sizing: border-box;
+    outline: none;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5em;
+    min-width: 800px;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+$colors: ('primary': rgb(252, 229, 24),
+    'white': #fff,
+    'light': #f9f9f9,
+    'grey': #999,
+    'dark': #222,
+    'black': #000,
+    'danger': rgba(255, 0, 0, 0.671)
+    );
+
+@each $colorKey,
+$color in $colors {
+    .text-#{$colorKey} {
+        color: $color;
+    }
+
+    .bg-#{$colorKey} {
+        background-color: $color;
+    }
+}
+
+@each $var in (left, center, right) {
+    .text-#{$var} {
+        text-align: $var;
+    }
+}
+
+$base-font-size: 1rem;
+$font-sizes: (xs: 0.625,
+    //10px
+    sm: 0.8125,
+    //13px
+    md: 1,
+    lg: 1.1875,
+    //19px
+    xl: 1.375, //22px
+    xxl: 1.625
+);
+
+@each $sizeKey,
+$size in $font-sizes {
+    .fs-#{$sizeKey} {
+        font-size: $size * $base-font-size;
+    }
+}
+
+$spacing-types: (m: margin,
+    p: padding);
+$spacing-directions: (t: top,
+    r: right,
+    b: bottom,
+    l: left);
+$spacing-base-size: 1rem;
+$spacing-sizes: (0: 0,
+    1: 0.25,
+    2: 0.5,
+    3: 1,
+    4: 1.5,
+    5: 3);
+
+@each $typeKey,
+$type in $spacing-types {
+
+    // .m-1
+    @each $sizeKey,
+    $size in $spacing-sizes {
+        .#{$typeKey}#{$sizeKey} {
+            #{$type}: $size * $spacing-base-size;
+        }
+    }
+
+    // .mx-1
+    @each $sizeKey,
+    $size in $spacing-sizes {
+        .#{$typeKey}x#{$sizeKey} {
+            #{$type}-left: $size * $spacing-base-size;
+            #{$type}-right: $size * $spacing-base-size;
+        }
+    }
+
+    // .my-1
+    @each $sizeKey,
+    $size in $spacing-sizes {
+        .#{$typeKey}y#{$sizeKey} {
+            #{$type}-top: $size * $spacing-base-size;
+            #{$type}-bottom: $size * $spacing-base-size;
+        }
+    }
+
+    // .mt-1 {margin-top: 0.25rem;}
+    @each $diretionKey,
+    $diretion in $spacing-directions {
+
+        @each $sizeKey,
+        $size in $spacing-sizes {
+            .#{$typeKey}#{$diretionKey}#{$sizeKey} {
+                #{$type}-#{$diretion}: $size * $spacing-base-size;
+            }
+        }
+    }
+}
+.ripple {
+    position: relative;
+    //隐藏溢出的径向渐变背景
+    overflow: hidden;
+    outline: 0;
+    cursor: pointer;
+}
+
+.ripple:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    //设置径向渐变
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+}
+
+.ripple:active:after {
+    outline: 0;
+    transform: scale(0, 0);
+    opacity: 0.5;
+    //设置初始状态
+    transition: 0s;
+}
+.dialog-btn {
+    height: 32px;
+    width: 60px;
+    line-height: 50%;
+    font-size: 16px;
+    border: none;
+    border-radius: 1em;
+}
+#app {
+    min-width: 600px;
+    height: 100%;
+}
+
+.lizi {
+    background-color: #fff;
+    height: 100%;
+    width: 100%;
+    position: fixed !important;
+    z-index: 0;
+}
+
+#top {
+    display: flex;
+    height: 50px;
+    padding: 0;
+    margin: 0;
+    background: #fff;
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #ccc;
+}
+
+#bottom {
+    height: 10%;
+    background-color: teal;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.main {
+    display: flex;
+    position: relative;
+    margin-left: 15%;
+    margin-right: 15%;
+    // width: 100%;
+    min-height: 100%;
+    padding-bottom: 50px;
+
+    .center {
+        position: relative;
+        order: 2;
+        min-width: 540px;
+        flex: 1;
+        box-sizing: border-box;
+        padding: 0 20px;
+        padding-top: 60px;
+    }
+
+    #left {
+        position: relative;
+        order: 1;
+        // padding-left: 12%;
+        padding-top: 50px;
+    }
+}
+.page {
+    box-sizing: border-box;
+    padding: 50px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 6px rgba(7, 17, 27, 0.06);
+    min-height: 92%;
+    position: relative;
+    // top: 60px;
+    // margin-bottom: 100px;
+    margin: 0 20%;
+}
+.page:hover {
+    box-shadow: 0 4px 12px 12px rgba(7, 17, 27, 0.15);
+}
+@media all and (max-width: 600px) {
+    /* Too narrow to support three columns */
+
+    .main {
+        flex-flow: column;
+    }
+
+    .main .center,
+    .main .left,
+    .main .right {
+        /* Return them to document order */
+
+        order: 0;
+        width: auto;
+    }
+}
+
+#backtop {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+    background-color: rgb(252, 229, 24);
+    z-index: 10000;
+    text-align: center;
+    line-height: 42px;
+    border: 1px solid #000;
+    box-shadow: 0 0 20px rgb(252, 229, 24);
+    transition: all 1s;
+    -webkit-transition: all 1s;
+    -moz-transition: all 1s;
+    -ms-transition: all 1s;
+    -o-transition: all 1s;
+}
+
+#dialog {
+    position: fixed;
+    right: 0;
+    width: 350px;
+    bottom: 100px;
+}
+
+.el-card {
+    margin-top: .625rem;
+    border-radius: 1rem;
+    -webkit-border-radius: 1rem;
+    -moz-border-radius: 1rem;
+    -ms-border-radius: 1rem;
+    -o-border-radius: 1rem;
+
+    .el-card__body {
+        padding: 0;
+    }
+
+    .Bulletin-board {
+        padding: .625rem;
+    }
+
+    .board-header {
+        box-sizing: content-box;
+        font-size: 16px;
+        font-weight: 800;
+        padding: .3125rem 1.25rem;
+        padding-top: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .board-main {
+        box-sizing: border-box;
+        padding: 0 1.25rem;
+        padding-bottom: 1.25rem;
+    }
+}
+
+.el-dropdown-menu__item:focus,
+.el-dropdown-menu__item:not(.is-disabled):hover {
+        background-color: #000;
+        color: rgb(252, 229, 24);
+}
+
+.burl {
+    /* position: fixed; */
+    width: 300px;
+}
