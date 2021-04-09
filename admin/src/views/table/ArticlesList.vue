@@ -17,8 +17,7 @@
                         <el-tag v-for="(item, index) in scope.row.categories" :key="index">{{ item.name }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="阅读量" align="center" prop="views">
-                </el-table-column>
+                <el-table-column label="阅读量" align="center" prop="views"> </el-table-column>
                 <el-table-column label="编辑时间" align="center">
                     <template scope="scope">
                         {{ scope.row.datetime | playTimeFormat }}
@@ -43,8 +42,8 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <el-pagination 
-                style="margin-top: .625rem"
+            <el-pagination
+                style="margin-top: 0.625rem"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :total="articles.length"
@@ -79,7 +78,13 @@
                         <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="model.brief"> </el-input>
                     </el-form-item>
                     <el-form-item label="标签">
-                        <el-select v-model="model.categories" multiple value-key="name" placeholder="请选择" style="width: 20rem">
+                        <el-select
+                            v-model="model.categories"
+                            multiple
+                            value-key="name"
+                            placeholder="请选择"
+                            style="width: 20rem"
+                        >
                             <el-option
                                 v-for="item of categories"
                                 :key="item._id"
@@ -94,7 +99,7 @@
                             :action="$http.defaults.baseURL + '/upload'"
                             :headers="getAuthHeaders()"
                             :show-file-list="false"
-                            :on-success="res => $set(model, 'icon', res.url)"
+                            :on-success="(res) => $set(model, 'icon', res.url)"
                         >
                             <img v-if="model.icon" :src="model.icon" class="avatar" />
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -167,10 +172,10 @@ export default {
         },
         isClose(done) {
             this.$confirm('确认关闭？')
-                .then(_ => {
+                .then((_) => {
                     done();
                 })
-                .catch(_ => {});
+                .catch((_) => {});
         },
         newDialog() {
             this.model = {};
@@ -179,12 +184,14 @@ export default {
         // 新建文章
         async save(id) {
             let res; // eslint-disable-line no-unused-vars
-            this.model.datetime = new Date();
             this.model.content = this.$refs.md.d_render;
             this.model.views = 1;
             if (id) {
+                this.model.update = new Date();
                 res = await this.$http.put(`rest/articles/${id}`, this.model);
             } else {
+                this.model.datetime = new Date();
+                this.model.update = new Date();
                 res = await this.$http.post('rest/articles', this.model);
             }
             this.$message({
@@ -205,7 +212,7 @@ export default {
         // 获取分类列表
         async fetchCategories() {
             const { data: res } = await this.$http.get(`rest/categories`); // eslint-disable-line no-unused-vars
-            this.categories = res.find(key => key.name === '文章标签').children;
+            this.categories = res.find((key) => key.name === '文章标签').children;
         },
         async $imgAdd(pos, $file) {
             // 第一步.将图片上传到服务器.
@@ -214,10 +221,10 @@ export default {
             const res = await this.$http.post('upload', formdata);
             this.$refs.md.$img2Url(pos, res.data.url);
         },
-        handleSizeChange: function(val) {
+        handleSizeChange: function (val) {
             this.pagesize = val;
         },
-        handleCurrentChange: function(currentPage) {
+        handleCurrentChange: function (currentPage) {
             this.currentPage = currentPage;
         }
     }
@@ -225,5 +232,4 @@ export default {
 </script>
 
 <style>
-
 </style>

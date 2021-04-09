@@ -1,18 +1,22 @@
 <template>
     <div id="browsing">
         <el-card class="Bulletin-board">
-            <div class="board-header">
-                <span>随便看看</span>
+            <div class="board-header font-a">
+                <span>全部分类</span>
             </div>
             <div class="board-main">
-                <div class="sidebar-item" v-for="(item, index) in items">
-                    <img class="sidebar-img" :src="item.icon" alt="" />
-                    <div class="sidebar-rand-info">
-                        <div class="sidebar-rand-date">
-                            <i>{{item.datetime | playTimeFormat}}</i>
-                        </div>
-                        <a class="sidebar-rand-title" href="">{{item.title}}</a>
-                    </div>
+                <div class="tag-border">
+                    <span
+                        class="tag-wrap"
+                        v-for="(item, index) in this.$store.state.type"
+                        :key="index"
+                        @click="toTypeList(item.name)"
+                    >
+                        <span class="tag"
+                            >{{ item.name }}
+                            <span class="tag-num">[{{ $store.state.articles[item.name].length }}]</span>
+                        </span>
+                    </span>
                 </div>
             </div>
         </el-card>
@@ -23,25 +27,55 @@
 export default {
     data() {
         return {
-            items: []
+            items: [],
+            typeList: {}
         };
     },
-    created() {
-        this.getArticleList();
+    mounted() {
     },
     methods: {
-        async getArticleList() {
-            const { data: res } = await this.$http2.get('/rest/articles');
-            // 洗牌随机获取3篇文章
-            this.items = this.utils.randSolt(res, 3);
+        toTypeList(key) {
+            this.$router
+                .push({
+                    name: `type`,
+                    params: {
+                        type: key
+                    }
+                })
+                .catch((err) => {
+                    err;
+                });
         }
-    },
+    }
 };
 </script>
 
 <style lang="scss">
 #browsing {
-    width: 300px;
+    position: relative;
+}
+.tag-border {
+    // float: left;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 10px;
+    .tag-wrap {
+        cursor: pointer;
+        .tag {
+            // background: #fff;
+            // color: rgb(216, 195, 11);
+        }
+        .tag-num {
+            font-family: iconfont !important;
+            font-size: 16px;
+            font-weight: 500;
+        }
+    }
+    .tag-wrap:hover {
+        filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.9));
+    }
 }
 .sidebar-item {
     height: 7rem;
@@ -80,5 +114,4 @@ export default {
         }
     }
 }
-
 </style>

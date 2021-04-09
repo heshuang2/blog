@@ -1,6 +1,6 @@
 <template>
-    <div v-show="backTopShow" id="backtop" @click="backTop">
-        <span class="backtop-btn el-icon-upload2 "></span>
+    <div id="backtop" @click="backTop" :class="{'backtop-show': !backTopShow}">
+        <span class="backtop-btn el-icon-upload2"></span>
         <span class="backtop-border"></span>
         <span class="backtop-border"></span>
     </div>
@@ -24,7 +24,7 @@ export default {
         window.addEventListener('scroll', this.backTopShowOperate, true);
     },
     methods: {
-        backTopShowOperate: function() {
+        backTopShowOperate: function () {
             let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
             if (scrollTop > this.showPx) {
                 this.backTopShow = true;
@@ -36,7 +36,7 @@ export default {
             this.backToTopShow = false;
             this.backTopAllow = false;
             var step = document.documentElement.scrollTop / this.backSeconds;
-            var backTopInterval = setInterval(function() {
+            var backTopInterval = setInterval(function () {
                 if (document.documentElement.scrollTop > 0) {
                     document.documentElement.scrollTop -= step;
                 } else {
@@ -52,6 +52,9 @@ export default {
 <style lang="scss">
 #backtop {
     // position: relative;
+    cursor: pointer;
+    opacity: 1;
+    transition: all .5s;
     .backtop-border {
         -webkit-animation: living 3s linear infinite;
         position: absolute;
@@ -64,20 +67,17 @@ export default {
         z-index: -1;
     }
     .backtop-btn {
-    z-index: 0;
-    font-size: 20px;
-    font-weight: bolder !important;
-    cursor: pointer;
+        z-index: 0;
+        font-size: 20px;
+        font-weight: bolder !important;
+    }
 }
+.backtop-show {
+    opacity: 0 !important;
 }
 
-
-#backtop:hover .backtop-border {
-}
 #backtop:hover .backtop-btn {
     animation: key 1s linear;
-}
-.backtop-border {
 }
 
 @keyframes living {

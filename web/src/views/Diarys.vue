@@ -1,6 +1,6 @@
 <template>
     <div id="diarys">
-        <div class="container">
+        <div class="container diarys-body">
             <div class="doc-container">
                 <div class="timeline-main">
                     <!-- 时间线 -->
@@ -15,7 +15,7 @@
                             <ul>
                                 <li>
                                     <div class="h4 animated fadeInLeft">
-                                        <p class="date ">{{ element.time }}</p>
+                                        <p class="date">{{ element.time }}</p>
                                     </div>
                                     <p class="animated dot-circle">
                                         <i class="el-icon-s-flag"></i>
@@ -45,22 +45,23 @@ export default {
         };
     },
     created() {
+        this.utils.initializeFlag();
         this.getTrivialList();
     },
     methods: {
         async getTrivialList() {
             const { data: res } = await this.$http2.get('/rest/Trivial');
-            res.reverse();
-            res.forEach(item => {
+            res.data.reverse();
+            res.data.forEach((item) => {
                 item.datetime = this.$options.filters['playTimeFormat'](item.datetime);
                 item.year = item.datetime.substring(0, 4);
                 item.time = item.datetime.substring(5);
                 item.time = item.time.replace('-', '月').slice(0, 5) + '日' + item.time.slice(5);
                 this.trivialList[item.year] = [];
             });
-            Object.keys(this.trivialList).forEach(element => {
+            Object.keys(this.trivialList).forEach((element) => {
                 this.year.unshift(element);
-                this.trivialList[element] = res.filter(item => element === item.year);
+                this.trivialList[element] = res.data.filter((item) => element === item.year);
             });
             // console.log(res);
         }
@@ -69,17 +70,13 @@ export default {
 </script>
 
 <style lang="scss">
-
-.container {
-    padding: 70px 0;
-    box-sizing: border-box;
-    margin-left: 15%;
-    margin-right: 15%;
+.diarys-body {
+    padding: 60px 0;
 }
 
 .doc-container {
     box-sizing: border-box;
-    background-color:  rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
     // height: 600px;
     width: 100%;
     padding: 15px;
@@ -99,9 +96,9 @@ export default {
     background: #484348;
     z-index: 0;
 }
+
 .timeline-year {
     margin: 10px 0;
-
 }
 .yearToggle {
     box-sizing: border-box;
@@ -115,7 +112,27 @@ h5,
 h6 {
     font-weight: 400;
 }
-@media (min-width: 768px) {
+@media (max-width: 960px) {
+    .timeline-line,
+    .dot-circle {
+        display: none;
+    }
+    .timeline-month {
+        border-bottom: 1px solid #e0e0e0;
+        .fadeInLeft {
+            padding-bottom: 10px;
+        }
+        .content {
+            max-width: 100%;
+        }
+    }
+}
+@media (max-width: 1264px) {
+    .timeline-line {
+        left: 19.5%;
+    }
+}
+@media (min-width: 1264px) {
     .timeline-main h2,
     .timeline-main h3 {
         width: 16%;
@@ -123,8 +140,11 @@ h6 {
         color: #000;
         text-align: right;
     }
+    .timeline-line {
+        left: 16.5%;
+    }
 }
-@media (min-width: 992px) {
+@media (min-width: 960px) {
     .timeline-main h2 > a {
         font-size: 30px;
         font-weight: 800;
@@ -156,9 +176,8 @@ li {
     padding: 10px 0;
     list-style: none;
 }
-@media (min-width: 768px) {
+@media (min-width: 960px) {
     .timeline-month > ul > li .h4 {
-        width: 16%;
         display: inline-block;
         text-align: right;
         float: left;
@@ -171,7 +190,7 @@ li {
     color: #fff;
     font-size: 16px;
     box-sizing: border-box;
-    background-color: #484348;;
+    background-color: #484348;
     border-radius: 1em;
 }
 .dot-circle {
@@ -191,7 +210,7 @@ li {
     -webkit-animation-name: fadeInRight;
     animation-name: fadeInRight;
 }
-@media (min-width: 768px) {
+@media (min-width: 1px) {
     .content {
         box-sizing: border-box;
         max-width: 70%;
@@ -206,7 +225,7 @@ li {
         img {
             box-sizing: border-box;
             width: 100%;
-            margin-top: .625rem;
+            margin-top: 0.625rem;
         }
     }
 }

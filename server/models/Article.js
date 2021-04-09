@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 // 创建一个Mongoose模型，按需引用
 const schema = new mongoose.Schema({
@@ -11,16 +11,19 @@ const schema = new mongoose.Schema({
     brief: {
         type: String
     },
-    categories: [{
-        _id: {
-            type: mongoose.SchemaTypes.ObjectId,
-            ref: 'Category'
-        },
-        name: {
-            type: String
+    categories: [
+        {
+            _id: {
+                type: mongoose.SchemaTypes.ObjectId,
+                ref: 'Category'
+            },
+            name: {
+                type: String
+            }
         }
-    }],
+    ],
     datetime: Date,
+    update: Date,
     mdtext: {
         type: String
     },
@@ -29,7 +32,10 @@ const schema = new mongoose.Schema({
     },
     views: {
         type: Number
+    },
+    comments: {
+        type: Array
     }
-})
+});
 
-module.exports = mongoose.model('Article', schema)
+module.exports = mongoose.model('Article', schema);

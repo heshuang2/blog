@@ -1,5 +1,8 @@
 <template>
     <div id="left">
+        <div class="flex-middle-between">
+            <span class="title"></span>
+        </div>
         <div class="burl">
             <el-card class="Bulletin-board" shadow="hover">
                 <div class="board-header">
@@ -9,29 +12,8 @@
                     <span class="">测试版本</span>
                 </div>
             </el-card>
-            <!-- <el-card shadow="hover">
-                <el-menu default-active="1" mode="horizontal" @select="handleSelect">
-                    <el-menu-item index="1" class="menu-span">
-                        <i class="el-icon-menu"></i>
-                        <span slot="title">文章列表</span>
-                    </el-menu-item>
-                    <el-menu-item index="2" class="menu-span">
-                        <i class="el-icon-document"></i>
-                        <span slot="title">我的项目</span>
-                    </el-menu-item>
-                    <el-menu-item index="3" class="menu-span">
-                        <i class="el-icon-setting"></i>
-                        <span slot="title">杂七杂八</span>
-                    </el-menu-item>
-                    <el-menu-item index="4" class="menu-span">
-                        <i class="el-icon-setting"></i>
-                        <span slot="title">联系我吧</span>
-                    </el-menu-item>
-                </el-menu>
-            </el-card> -->
-            <swiper-card></swiper-card>
             <new-message></new-message>
-            <div ref="browsing">
+            <div ref="browsing" :class="{ is_fixed: isFixed }">
                 <browsing></browsing>
             </div>
         </div>
@@ -45,6 +27,13 @@ import NewMessage from './newMessage/newMessage.vue';
 import SwiperCard from './swiperCard/SwiperCard.vue';
 
 export default {
+    data() {
+        return {
+            isFixed: false,
+            offsetTop: 0,
+            flag: false
+        };
+    },
     components: {
         musicCard,
         SwiperCard,
@@ -53,23 +42,21 @@ export default {
     },
     mounted() {
         window.addEventListener('scroll', this.scrollHander, true);
+        this.$nextTick(() => {
+            this.offsetTop = this.utils.getTop(this.$refs.browsing)+ 175;
+        });
+    },
+    activated() {
+    },
+    deactivated() {
+        // window.removeEventListener('scroll', this.scrollHander, true);
     },
     methods: {
-        handleSelect(key, keyPath) {
-            console.log(key, keyPath);
-        },
         // 监听页面滚动条滑动，实现吸顶效果
         scrollHander() {
             let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-            if (this.$refs.browsing) {
-                if (scrollTop >= 626) {
-                    this.$refs.browsing.style.top = '50px';
-                    this.$refs.browsing.style.position = 'fixed';
-                } else {
-                    // this.$refs.browsing.style.top = '';
-                    this.$refs.browsing.style.position = '';
-                }
-            }
+            this.isFixed = scrollTop > this.offsetTop && this.$store.state.device ? true : false;
+            // console.log(this.isFixed);
         }
     }
 };
@@ -107,4 +94,5 @@ export default {
 .menu-span:hover {
     color: skyblue !important;
 }
+
 </style>

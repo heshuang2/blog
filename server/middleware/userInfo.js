@@ -2,9 +2,8 @@
 module.exports = (options) => {
     return async (req, res, next) => {
         const data = req.body;
-            console.log(data);
         if (data.infoId != '') {
-            const model = await req.Model.update(
+            const model = await req.Model.updateOne(
                 {
                     _id: data.infoId
                 },
@@ -15,7 +14,8 @@ module.exports = (options) => {
                             userInfoId: data.userInfo.id,
                             message: data.message,
                             datetime: data.datetime,
-                            isReply: data.isReply
+                            isReply: data.isReply,
+                            infoId: data.infoId
                         }
                     }
                 }

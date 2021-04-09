@@ -10,14 +10,25 @@ const store = new Vuex.Store({
     state: {
         currentUser: null,
         isLogin: false,
-        isDialog: false
+        isDialog: false,
+        // 处理代码高亮重复刷新
+        key: 0,
+        isLoding: false,
+        flag: false,
+        type: [],
+        // 分类文章
+        articles: [],
+        device: null,
+        mobile: false,
+        articleTitle: '',
+        slideList: []
     },
     getters,
     mutations,
     actions,
     plugins: [
         createPersistedState({
-            storage: window.sessionStorage,
+            storage: window.localStorage,
             reducer(val) {
                 return {
                     // 只储存state中的assessmentData

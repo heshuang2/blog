@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 export default {
     name: 'search',
     data() {
@@ -71,7 +70,6 @@ export default {
         this.getsongsList();
     },
     mounted() {
-        this.$refs.aplayer.addEventListener('scroll', this.scroll);
     },
     computed: {
         noMore() {
@@ -93,7 +91,6 @@ export default {
         getMusic(id) {
             this.$bus.$emit('musicId', id);
         },
-        scroll() {},
         // 搜索音乐
         searchMusic() {
             if (this.input === '') {
@@ -129,7 +126,8 @@ export default {
             this.isInput = false;
             this.loading = true;
             setTimeout(() => {
-                (this.pageNum += 1), this.getMusicList();
+                this.pageNum += 1;
+                this.getMusicList();
                 this.loading = false;
             }, 500);
         },

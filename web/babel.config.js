@@ -8,5 +8,10 @@ module.exports = {
         styleLibraryName: "theme-chalk",
       },
     ],
+    ['import', {
+      libraryName: 'vant',
+      libraryDirectory: 'es',
+      style: true
+    }, 'vant']
   ],
 };

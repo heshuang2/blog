@@ -1,8 +1,8 @@
 <template>
     <div id="message">
-        <div class="message-main">
-            <div class="page bg-white">
-                <hr />
+        <div class="container message-main">
+            <div v-if="!this.$store.state.mobile" class="page bg-white">
+                <hr v-if="!this.$store.state.mobile" />
                 <div class="post-comment">
                     <div class="comment-head">
                         <div class="comment-headline">
@@ -11,121 +11,129 @@
                         </div>
                     </div>
                     <div class="message-board">
-                        <message-board></message-board>
-                        <div class="comment-list">
-                            <div class="list-item" v-for="(item, index) in messageList" :key="index">
-                                <div class="user-face">
-                                    <a href="">
-                                        <div class="user-avatar">
-                                            <img :src="item.user.avatar" alt="" />
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="user-content">
-                                    <div class="user-name">
-                                        <a href="">{{ item.user.name }}</a>
-                                    </div>
-                                    <div class="user-text">
-                                        <span class="con" v-html="$options.filters.Emoji(item.message)"></span>
-                                        <span class="like">
-                                            <!-- <svg-icon></svg-icon> -->
-                                        </span>
-                                    </div>
-                                    <div class="user-info">
-                                        <span class="time">{{ item.user.datetime | playTimeFormat }}</span>
-                                        <span class="reply" @click="replyBtnF(index, item._id, item.user)">回复</span>
-                                    </div>
-                                    <div
-                                        class="reply-box"
-                                        v-if="item.children"
-                                        v-for="(itemChild, i) in item.children"
-                                        :key="i"
-                                    >
-                                        <div class="reply-item">
-                                            <a href="" class="reply-face">
-                                                <img :src="itemChild.user.avatar" alt="" />
-                                            </a>
-                                            <div class="reply-con">
-                                                <div class="reply-user">
-                                                    <a class="reply-name">{{ itemChild.user.name }}</a>
-                                                    <span class="reply-userInfo" v-if="itemChild.isReply == 1"
-                                                        >回复<a href="">@{{ itemChild.userInfo.name }}</a></span
-                                                    >
-                                                    <span
-                                                        class="reply-text"
-                                                        v-html="$options.filters.Emoji(itemChild.message)"
-                                                    ></span>
-                                                </div>
-                                                <div class="user-info">
-                                                    <span class="time">{{ itemChild.datetime | playTimeFormat }}</span>
-                                                    <span
-                                                        class="reply"
-                                                        @click="replyBtnC(index, item._id, itemChild.user)"
-                                                        >回复</span
-                                                    >
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <message-board v-show="isReply == index" ref="replyBoard"></message-board>
-                                </div>
-                            </div>
-                        </div>
+                        <message-board :messageLists="messageLists"></message-board>
+                        <message-list ref="messageList" :messageLists="messageLists" :count="count"></message-list>
                     </div>
                 </div>
+            </div>
+            <div v-else class="container page bg-light">
+                <div>欢迎留言</div>
+                <message-list-h5 ref="messageList" :messageLists="messageLists" :count="count"></message-list-h5>
+                <bottom-bar-h5></bottom-bar-h5>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import MessageBoard from '../components/messageBoard/MessageBoard.vue';
+import MessageBoard from '../components/messageCom/MessageBoard.vue';
 import SvgIcon from '../components/SvgIcon/SvgIcon.vue';
-import emotions from '../utils/emotion';
+import MessageList from '../components/messageCom/MessageList.vue';
+import BottomBarH5 from '../components/h5_components/botomBar_h5/BottomBar_h5.vue';
+import MessageListH5 from '../components/h5_components/messageList_h5/MessageList_h5.vue';
 export default {
-    components: { MessageBoard, SvgIcon },
+    components: { MessageList, MessageBoard, SvgIcon, BottomBarH5, MessageListH5 },
     data() {
         return {
             isReply: -1,
-            messageList: []
+            messageLists: [],
+            user: this.$store.state.currentUser,
+            count: 0
         };
     },
     created() {
-        this.getMessageList();
+        this.utils.initializeFlag();
+        this.getMessageList(1, 110);
     },
-    filters: {
-        Emoji: function (str) {
-            return str.replace(/\[#[\u4E00-\u9FA5]{1,5}]/g, (words) => {
-                let word = words.replace(/#|\[|\]/g, '');
-                let index = emotions.emotionList.indexOf(word);
-                if (index !== -1) {
-                    return `<img src="https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/${index}.gif" align="center">`;
-                } else {
-                    return words;
-                }
-            });
-        }
+    mounted() {
+        this.$bus.$on('getMessageList', this.getMessageList);
     },
     methods: {
-        async getMessageList() {
-            const { data: res } = await this.$http2.get('/rest/messages');
-            console.log(res);
-
-            this.messageList = res;
-        },
-        replyBtnF(index, id, data) {
-            this.isReply = index;
-            this.$refs.replyBoard[index].userMessage.userInfo.name = '@' + data.name;
-            this.$refs.replyBoard[index].userMessage.userInfo.id = data._id;
-            this.$refs.replyBoard[index].userMessage.infoId = id;
-            this.$refs.replyBoard[index].userMessage.isReply = 0;
-        },
-        replyBtnC(index, id, data) {
-            this.isReply = index;
-            this.$refs.replyBoard[index].userMessage.userInfo.name = '@' + data.name;
-            this.$refs.replyBoard[index].userMessage.userInfo.id = data._id;
-            this.$refs.replyBoard[index].userMessage.infoId = id;
-            this.$refs.replyBoard[index].userMessage.isReply = 1;
+        async getMessageList(num, limit, key, index, item) {
+            const { data: res } = await this.$http2.get('rest/messages/', {
+                params: {
+                    skip: num,
+                    limit: limit
+                },
+                paramsSerializer: (params) => {
+                    return this.$qs.stringify(params, { indices: false });
+                }
+            });
+            this.utils.IsDel(res.data, this);
+            this.count = res.count;
+            switch (key) {
+                case 1:
+                    this.$refs.messageList.isLoad = true;
+                    this.messageLists = this.messageLists.concat(res.data);
+                    break;
+                case 2:
+                    let flag1,
+                        flag2 = false;
+                    // 新增删除留言评论处理展开回复状态
+                    switch (res.data.length - this.messageLists.length) {
+                        case 1:
+                            item = null;
+                            flag1 = true;
+                            break;
+                        case -1:
+                            item = null;
+                            flag2 = true;
+                            break;
+                        default:
+                            break;
+                    }
+                    this.messageLists = res.data;
+                    if (flag1) {
+                        this.$nextTick(() => {
+                            console.log(this.$store.state.slideList);
+                            this.$store.state.slideList.forEach((key, index) => {
+                                this.$store.state.slideList[index] = key + 1;
+                                this.messageLists[key + 1].isDrop = false;
+                                this.$bus.$emit('clearLeave', key);
+                                this.$bus.$emit('slideEnter', key + 1);
+                            });
+                            console.log(this.$store.state.slideList);
+                            flag1 = false;
+                        });
+                    }
+                    if (flag2) {
+                        this.$nextTick(() => {
+                            console.log(index);
+                            this.$bus.$emit('slideLeave', index);
+                            console.log(this.$store.state.slideList);
+                            this.$store.state.slideList.forEach((key, i) => {
+                                // console.log(this.$store.state.slideList);
+                                if (key > index) {
+                                    this.$store.state.slideList[i] = key - 1;
+                                    this.messageLists[key - 1].isDrop = false;
+                                    this.$bus.$emit('clearLeave', key);
+                                    this.$bus.$emit('slideEnter', key - 1);
+                                } else {
+                                    console.log(key);
+                                    this.messageLists[key].isDrop = false;
+                                    this.$bus.$emit('slideEnter', key);
+                                }
+                            });
+                            console.log(this.$store.state.slideList);
+                            index = null;
+                            flag2 = false;
+                        });
+                    }
+                    break;
+                default:
+                    this.messageLists = this.messageLists.concat(res.data);
+            }
+            if (index != null) {
+                this.messageLists[index].isDrop = false;
+            }
+            if (this.$store.state.mobile && item) {
+                this.$nextTick(() => {
+                    this.$store.state.slideList.forEach((key) => {
+                        this.messageLists[key].isDrop = false;
+                    });
+                    this.$bus.$emit('slideEnter', index, item);
+                });
+            }
         }
     }
 };
@@ -133,14 +141,17 @@ export default {
 <style lang="scss">
 #message {
     min-height: 90%;
-    .str {
+    /*  .str {
         display: flex;
         padding: 2px;
         align-items: center;
-    }
+    } */
     .message-main {
+        margin: auto;
         position: relative;
-        padding: 60px 0;
+        box-sizing: border-box;
+        display: block !important;
+        padding-top: 60px;
     }
     hr {
         width: calc(100% - 4px);
@@ -223,13 +234,16 @@ export default {
                         .reply {
                             padding: 0 5px;
                             border-radius: 4px;
-                            margin-right: 15px;
+                            margin-left: 15px;
                             cursor: pointer;
                             display: inline-block;
                         }
                         .reply:hover {
                             color: #00a1d6;
                             background: #e5e9ef;
+                        }
+                        .more {
+                            display: none;
                         }
                     }
                     .reply-box {
@@ -281,6 +295,19 @@ export default {
                                     }
                                 }
                             }
+                        }
+                    }
+                    .reply-box:hover {
+                        .more {
+                            display: block;
+                        }
+                    }
+                    .close {
+                        display: flex;
+                        .close-reply {
+                            cursor: pointer;
+                            margin-left: auto;
+                            z-index: 1;
                         }
                     }
                 }

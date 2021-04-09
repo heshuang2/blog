@@ -22,6 +22,10 @@ const schema = new mongoose.Schema({
                 type: mongoose.SchemaTypes.ObjectId,
                 ref: 'User'
             },
+            infoId: {
+                type: mongoose.SchemaTypes.ObjectId,
+                ref: 'Message'
+            },
             message: {
                 type: String
             },

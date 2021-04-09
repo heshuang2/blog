@@ -1,62 +1,128 @@
 <template>
-    <div class="main">
-        <div class="center">
-            <div id="home">
-                <div class="card-box">
-                    <article class="article have-img d-flex" v-for="(item, index) in articles" :key="index">
-                        <div class="blur-img">
-                            <img :src="item.icon" alt="" />
-                        </div>
-                        <a class="article-img " :class="[index % 2 === 0 ? 'img-right' : 'img-left']">
-                            <img class="lazy loaded" :src="item.icon" alt="" />
-                        </a>
-                        <div class="article-ctx">
-                            <header class="article-info">
-                                <div class="article-time">
-                                    <svg-icon icon-class="date" class="article-icon" />
-                                    {{ item.datetime | playTimeFormat }}
-                                </div>
-                                <div class="article-vs">
-                                    <svg-icon icon-class="iview" class="article-icon" />
-                                    {{ item.views }}阅读
-                                </div>
-                            </header>
-                            <a class="article-title a-none" href="">{{ item.title }}</a>
-                            <a class="article-description a-none" href="">{{item.brief | beautySub(47)}}</a>
-                        </div>
-                    </article>
+    <div class="main" :class="this.$store.state.mobile ? 'bg-light' : ''">
+        <swiper-card ref="swiper"></swiper-card>
+        <div class="container main-body">
+            <div class="center">
+                <div v-if="!this.$store.state.device && !this.$store.state.mobile" class="type-card">
+                    <browsing></browsing>
+                </div>
+                <div id="home">
+                    <div class="flex-middle-between">
+                        <span class="title">全部文章</span>
+                    </div>
+                    <div class="card-box">
+                        <article-card v-if="!this.$store.state.mobile" :articles="articles"></article-card>
+                        <article-card-h5 v-else :articles="articles"></article-card-h5>
+                        <infinite-loading
+                            infinite-scroll-disabled="busy"
+                            @infinite="infiniteHandler"
+                            ref="infiniteLoading"
+                        >
+                            <span slot="no-more"> 我们是有底线的 </span>
+                        </infinite-loading>
+                    </div>
                 </div>
             </div>
+            <left v-if="this.$store.state.device"></left>
         </div>
-        <left />
     </div>
 </template>
 
 <script>
 import left from '../components/left';
+import SwiperCard from '../components/swiperCard/SwiperCard.vue';
+import InfiniteLoading from 'vue-infinite-loading';
+import SvgIcon from '../components/SvgIcon/SvgIcon.vue';
+import ArticleCard from '../components/articleCard/ArticleCard.vue';
+import Browsing from '../components/browsing/Browsing.vue';
+import ArticleCardH5 from '../components/h5_components/articleCard_h5/articleCard_h5.vue';
 export default {
     name: 'Home',
     data() {
         return {
-            count: 20,
-            articles: []
+            count: 0,
+            articles: [],
+            pageNum: 0,
+            loading: true,
+            busy: true,
+            data: []
         };
     },
     components: {
-        left
+        left,
+        SwiperCard,
+        InfiniteLoading,
+        SvgIcon,
+        ArticleCard,
+        Browsing,
+        ArticleCardH5
     },
     created() {
         this.getArticleList();
+        this.utils.initializeFlag();
     },
+    mounted() {},
     methods: {
+        // 监听页面滚动条滑动
+        async infiniteHandler($state) {
+            if (this.busy) {
+                const { data: res } = await this.$http2.get('/rest/comments');
+                this.data = res;
+            }
+            this.busy = false;
+            if (this.articles.length < this.data.length) {
+                let articlesComments = this.data.slice(this.pageNum, this.pageNum + 2);
+                setTimeout(() => {
+                    this.articles = this.articles.concat(articlesComments);
+                    $state.loaded();
+                    this.pageNum += 2;
+                }, 200);
+            } else {
+                $state.complete();
+            }
+        },
         async getArticleList() {
-            const { data: res } = await this.$http2.get('/rest/articles');
-            this.articles = res;
+            const { data: res1 } = await this.$http2.get('/rest/categorys');
+            const { data: res2 } = await this.$http2.get('/rest/articles');
+            let type = res1.data.find((key) => key.name === '文章标签').children;
+            let typeList = [];
+            type.forEach((key) => {
+                typeList[key.name] = [];
+            });
+            res2.data.forEach((element) => {
+                element.categories.forEach((item) => {
+                    Object.keys(typeList).forEach((key) => {
+                        if (item.name === key) {
+                            typeList[key].push(element);
+                        }
+                    });
+                });
+            });
+            this.$store.commit('handleType', type);
+            this.$store.commit('handleArticle', typeList);
         }
     }
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss" >
+.type-card {
+    padding-top: 30px;
+    .el-card {
+        border: none;
+        background: #fff;
+        .board-header {
+            font-size: 21px;
+        }
+    }
+    .is-always-shadow {
+        box-shadow: none !important;
+    }
+}
+.main-body {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1 1 auto;
+}
 .card-box {
     width: 100%;
     height: 100%;
@@ -65,7 +131,7 @@ export default {
 }
 .article:not(.card-style) {
     position: relative;
-    height: 14.5rem;
+    min-height: 14.5rem;
     border-radius: 1em;
     overflow: hidden;
     // border: 0.5px solid #000;
@@ -124,14 +190,67 @@ export default {
     }
     .article-ctx {
         color: #fff;
-        width: 50%;
+        width: 60%;
         display: flex;
         justify-content: space-between;
         flex-direction: column;
-        padding: 2rem 2rem;
         z-index: 2;
-        text-align: center;
-
+        .post-info {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-shadow: 0 0.1875rem 0.3125rem rgba(0, 0, 0, 1);
+            .article-icon {
+                font-size: 20px;
+                padding-right: 0.1875rem;
+            }
+            .article-time,
+            .article-vs {
+                display: flex;
+                align-items: center;
+            }
+        }
+        .post-meta {
+            position: relative;
+            margin-top: 0px;
+            height: 100%;
+            width: 100%;
+            padding-top: 100px !important;
+            padding-bottom: 0 !important;
+            // background-color: rgba(0, 0, 0, 0.3) !important;
+            color: #fff !important;
+            transition: all 0.3s;
+            border-radius: 5px;
+            .post-title {
+                text-align: center;
+                width: 100%;
+                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+                font-weight: 1000;
+                font-size: 25px;
+                transition: all 0.1s;
+                line-height: 30px;
+                transition: 1s;
+                letter-spacing: 0.06rem;
+                text-shadow: 0 0.1875rem 0.3125rem rgba(0, 0, 0, 1);
+                box-sizing: border-box;
+                position: absolute;
+                bottom: 50px;
+            }
+            .post-description {
+                position: absolute;
+                bottom: 0;
+                padding: 10px;
+                opacity: 0;
+                transition: 1s;
+                box-sizing: border-box;
+            }
+        }
         .article-info {
             font-size: 13px;
             font-weight: 600;
@@ -140,22 +259,9 @@ export default {
             width: 100%;
             height: 1.5rem;
             line-height: 1.5rem;
-         
-            .article-icon {
-                font-size: 20px;
-                padding-right: 0.1875rem;
-            }
-            .article-time {
-                display: inline-flex;
-                align-items: center;
-            }
-            .article-vs {
-                display: inline-flex;
-                align-items: center;
-            }
         }
-        .article-title,
-        .article-description {
+        .article-text {
+            padding: 0 10px;
             letter-spacing: 0.06rem;
             text-shadow: 0 0.1875rem 0.3125rem rgba(0, 0, 0, 1);
         }
@@ -164,18 +270,24 @@ export default {
             font-weight: 1000;
             font-size: 27px;
             transition: 1s ease-out;
+            line-height: 30px;
+            transition: 1s;
+            position: relative;
+            width: 100%;
         }
         .article-description {
             // width: 100%;
             height: 3rem;
             overflow: hidden;
-            transition: 0.8s;
+            transition: 2s;
             opacity: 0;
-            z-index: 0;
+            z-index: -1;
+            position: fixed;
         }
         .a-none {
             color: inherit;
             text-decoration: none;
+            width: 100%;
         }
     }
 }
@@ -189,14 +301,13 @@ export default {
         transform: scale(1.2);
     }
     .article-ctx {
-        .article-title {
-           
-        }
-        .article-info,
-        .article-description {
+        .post-title {
+            transform: translateY(-50px) scale(1);
             opacity: 1;
-            visibility: visible;
-            z-index: 1;
+        }
+        .post-description {
+            opacity: 1 !important;
+            transform: translateY(-10px);
         }
     }
 }

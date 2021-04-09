@@ -6,6 +6,8 @@ module.exports = (app) => {
     const authWeb = require('../../middleware/authWeb');
     const messageUser = require('../../middleware/messageUser');
     const userInfo = require('../../middleware/userInfo');
+    const removeMessage = require('../../middleware/removeMessage');
+    const articleComments = require('../../middleware/articleComments');
     const User = require('../../models/User');
     const router = express.Router({
         // 合并url参数
@@ -15,15 +17,33 @@ module.exports = (app) => {
     const Category = require('../../models/Category');
 
     router.get('/', async (req, res) => {
-        const queryOptions = {};
+        // console.log(req.query);
+        let skip = 1,
+            limit = 0;
+        req.query.skip ? (skip = parseInt(req.query.skip)) : skip;
+        req.query.limit ? (limit = parseInt(req.query.limit)) : limit;
         // 创建数据,.populate('parent')关联查询,setOptions()将后面的链式操作转换为对象方式
-        const items = await req.Model.find().setOptions(queryOptions).limit(10);
-        if (req.params.resource == 'messages') {
-            messageUser(items, User, res);
-        }else {
-            res.send(items);
+        if (req.params.resource == 'comments' && req.query.id) {
+            const model = await req.Model.find({ 'article._id': req.query.id })
+                .sort([['_id', -1]])
+                .skip((skip - 1) * limit)
+                .limit(limit);
+            const count = await req.Model.countDocuments({ 'article._id': req.query.id });
+            messageUser(model, User, res, count);
+        } else {
+            const items = await req.Model.find()
+                .sort([['_id', -1]])
+                .skip((skip - 1) * limit)
+                .limit(limit);
+            const count = await req.Model.estimatedDocumentCount();
+            if (req.params.resource == 'messages') {
+                messageUser(items, User, res, count);
+            } else if (req.params.resource == 'comments') {
+                articleComments(items, res);
+            } else{
+                res.send({ count, data: items });
+            }
         }
-        
     });
     router.get('/:id', async (req, res) => {
         if (req.params.resource == 'users') {
@@ -47,12 +67,20 @@ module.exports = (app) => {
             name: '会员'
         };
         const model = await req.Model.create(req.body);
+        console.log(model);
         res.send(model);
     });
     // 修改资源接口
     router.put('/:id', async (req, res) => {
         const model = await req.Model.findByIdAndUpdate(req.params.id, req.body);
         res.send(model);
+    });
+    // 删除资源接口
+    router.delete('/:id/:userId', removeMessage(), async (req, res) => {
+        await req.Model.findByIdAndDelete(req.params.id, req.body);
+        res.send({
+            success: true
+        });
     });
     app.use('/web/api/rest/:resource', authWeb(), resource(), router);
     // multer定义上传中间件
@@ -101,7 +129,7 @@ module.exports = (app) => {
         const content = {
             id: user._id
         };
-        const model =  await User.updateOne({ account }, { online: 0 });
+        const model = await User.updateOne({ account }, { online: 0 });
         const updateUser = await User.findOne({
             account
         });

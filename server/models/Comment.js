@@ -11,21 +11,39 @@ const schema = new mongoose.Schema({
             type: String
         }
     },
-    name: {
-        type: String
-    },
-    content: {
-        type: String
-    },
-    children: [{
-        name: {
-            type: String
-        },
-        content: {
-            type: String
+    user: {
+        _id: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: 'User'
         }
-    }],
-    datetime: Date
+    },
+    message: {
+        type: String
+    },
+    datetime: Date,
+    children: [
+        {
+            userId: {
+                type: mongoose.SchemaTypes.ObjectId,
+                ref: 'User'
+            },
+            userInfoId: {
+                type: mongoose.SchemaTypes.ObjectId,
+                ref: 'User'
+            },
+            infoId: {
+                type: mongoose.SchemaTypes.ObjectId,
+                ref: 'Message'
+            },
+            message: {
+                type: String
+            },
+            datetime: Date,
+            isReply: {
+                type: Number
+            }
+        }
+    ]
 });
 
 module.exports = mongoose.model('Comment', schema);

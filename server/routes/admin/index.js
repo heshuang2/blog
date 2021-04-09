@@ -1,11 +1,12 @@
-
 // 导出(app)函数，将app传递进来
-module.exports = app => {
+module.exports = (app) => {
     const express = require('express');
     const jwt = require('jsonwebtoken');
     const assert = require('http-assert');
     const AdminUser = require('../../models/AdminUser');
+    const User = require('../../models/User');
     const auth = require('../../middleware/auth');
+    const messageUser = require('../../middleware/messageUser');
     const resource = require('../../middleware/resource');
     const router = express.Router({
         // 合并url参数
@@ -31,8 +32,11 @@ module.exports = app => {
         const queryOptions = {};
         // 创建数据,.populate('parent')关联查询,setOptions()将后面的链式操作转换为对象方式
         const items = await req.Model.find().setOptions(queryOptions).limit(10);
-        
-        res.send(items);
+        if (req.params.resource == 'messages' || req.params.resource == 'comments') {
+            messageUser(items, User, res);
+        }else {
+            res.send(items);
+        }
     });
     //  获取资源详情接口
     router.get('/:id', async (req, res) => {

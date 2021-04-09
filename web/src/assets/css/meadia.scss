@@ -1,0 +1,62 @@
+.pc {
+    @media screen and (min-width: 960px) {
+        .main {
+            max-width: 960px;
+        }
+
+        .container {
+            max-width: 900px;
+            display: block !important;
+
+            .center {
+                max-width: 100%;
+                padding-right: 0;
+            }
+        }
+    }
+
+    @media screen and (max-width: 960px) {
+        .main {
+            width: 100%;
+            padding: 60px 20px;
+            box-sizing: border-box;
+
+            .container {
+                display: block;
+                width: 100%;
+
+                .center {
+                    width: 100%;
+                }
+
+                #left {
+                    display: none;
+                }
+            }
+        }
+
+    }
+
+    @media screen and (min-width: 1264px) {
+        .main {
+            max-width: 1185px;
+        }
+
+        .center {
+            flex: 0 0 66.6666666667%;
+            max-width: 66.6666666667%;
+        }
+
+        .container {
+            max-width: 1080px;
+            display: flex !important;
+
+        }
+
+        #type {
+            .type-body {
+                display: flex;
+            }
+        }
+    }
+}

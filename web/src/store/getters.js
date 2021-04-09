@@ -1,3 +1,12 @@
 export const currenUser = state => state.currenUser;
 export const isLogin = state => state.isLogin;
 export const isDialog = state => state.isDialog;
+export const key = state => state.key;
+export const isLoding = state => state.isLoding;
+export const flag = state => state.flag;
+export const type = state => state.type;
+export const articles = state => state.articles;
+export const device = state => state.device;
+export const mobile = state => state.mobile;
+export const articleTitle = state => state.articleTitle;
+export const slideList = state => state.slideList;

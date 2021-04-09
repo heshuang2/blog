@@ -1,11 +1,12 @@
 <template>
     <div class="comment-wrap">
+        <div class="err-tip fs-sm" :class="{ tipOver: isTip }">你还没有{{ this.article ? '评论' : '留言' }}</div>
         <div class="comment-input">
             <div v-if="!this.$store.state.isLogin" class="mask">
                 <div>请先<dialog-btn />(・ω・)</div>
             </div>
             <div class="vpanel">
-                <div class="avatar">
+                <div class="avatar" v-if="!this.$store.state.mobile">
                     <img v-if="this.$store.state.currentUser" :src="this.userMessage.user.avatar" alt="" />
                     <img v-else src="../../assets/img/0011.jpeg" alt="" />
                 </div>
@@ -13,6 +14,7 @@
                     <textarea
                         ref="inputVal"
                         class="vheader-input"
+                        :class="{ errBorder: errMsg }"
                         :placeholder="userMessage.userInfo.name"
                         cols="30"
                         rows="3"
@@ -20,7 +22,7 @@
                     ></textarea>
                 </div>
                 <div class="conment-submint">
-                    <button class="ripple" @click="toComment()">发表评论</button>
+                    <button class="ripple" @click="toComment(itemMsg)">发表{{ this.article ? '评论' : '留言' }}</button>
                 </div>
             </div>
             <div class="OwO-main">
@@ -30,7 +32,7 @@
                         <span>表情</span>
                     </el-button>
                 </div>
-                <div class="OwO-body" v-if="isEmotion">
+                <div class="OwO-body" :class="{ 'body-show': isEmotion }">
                     <el-tabs type="border-card" tab-position="bottom">
                         <el-tab-pane>
                             <span slot="label" class="icon"><svg-icon icon-class="QQicon"></svg-icon></span>
@@ -58,13 +60,39 @@ import SvgIcon from '../SvgIcon/SvgIcon.vue';
 import emotions from '../../utils/emotion';
 
 export default {
+    name: 'MessageBoard',
     components: { SvgIcon, DialogBtn },
+    props: {
+        article: {
+            type: Object,
+            // required: true,
+            default: null
+        },
+        messageLists: {
+            type: Array,
+            default: () => []
+        },
+        itemMsg: {
+            type: Number,
+            default: null
+        },
+        show: {
+            type: Boolean,
+            default: null
+        },
+        item: {
+            type: Object,
+            default: null
+        }
+    },
     data() {
         return {
             // isMessage: false,
             emotionArr: [],
-            isEmotion: false,
+            isEmotion: true,
             isDialog: false,
+            errMsg: false,
+            isTip: true,
             userMessage: {
                 user: this.$store.state.currentUser,
                 message: '',
@@ -72,15 +100,17 @@ export default {
                     name: '',
                     id: ''
                 },
-                infoId: ''
-            }
+                infoId: '',
+                article: {}
+            },
+            timer: null
         };
     },
     mounted() {
         this.loadEmotion();
         document.addEventListener('click', () => {
-            if (this.isEmotion == true) {
-                this.isEmotion = false;
+            if (this.isEmotion == false) {
+                this.isEmotion = true;
             }
         });
     },
@@ -107,11 +137,33 @@ export default {
             });
             this.emotionArr = emotionArr;
         },
-        async toComment() {
+        async toComment(index) {
+            if (this.userMessage.message != '') {
                 this.userMessage.datetime = new Date();
-                const { data: res } = await this.$http2.post('/rest/messages', this.userMessage);
+                // console.log(this.article);
+                if (this.article) {
+                    this.userMessage.article._id = this.article._id;
+                    this.userMessage.article.title = this.article.title;
+                    const { data: res } = await this.$http2.post(`/rest/comments`, this.userMessage);
+                    this.$bus.$emit('getArticleComment', 1, this.messageLists.length, 2, index, this.item);
+                } else {
+                    const { data: res } = await this.$http2.post('/rest/messages', this.userMessage);
+                    this.$bus.$emit('getMessageList', 1, this.messageLists.length, 2, index, this.item);
+                }
                 this.userMessage.message = '';
-                this.$parent.getMessageList();
+                this.errMsg = false;
+                if (this.show) {
+                    this.$emit('success', false);
+                }
+            } else {
+                this.errMsg = true;
+                this.isTip = false;
+                if (this.timer) clearTimeout(this.timer);
+                this.timer = setTimeout(() => {
+                    this.isTip = true;
+                }, 1500);
+            }
+            // 移动端
         }
     }
 };
@@ -120,6 +172,7 @@ export default {
 <style lang="scss">
 .comment-wrap {
     height: 100%;
+    position: relative;
     .comment-input {
         position: relative;
         height: 140px;
@@ -149,6 +202,23 @@ export default {
             border-radius: 5px;
             margin: 2px;
         }
+    }
+    .err-tip {
+        position: absolute;
+        z-index: 1;
+        right: -8px;
+        top: -20px;
+        background-color: #ef3e3e;
+        color: #fff;
+        box-sizing: border-box;
+        padding: 5px 10px;
+        border-radius: 5px;
+        opacity: 1;
+        transition: all 1s;
+    }
+    .tipOver {
+        opacity: 0;
+        z-index: 0;
     }
     .vpanel {
         margin: 5px 85px;
@@ -209,6 +279,9 @@ export default {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
                     'Open Sans', 'Helvetica Neue', sans-serif;
             }
+            .errBorder {
+                border: 1px solid #e40c0c;
+            }
             .vheader-input::-webkit-scrollbar {
                 width: 5px;
             }
@@ -244,8 +317,8 @@ export default {
             background: url(../../assets/img/data_image_png;base….png) 0 -49px no-repeat;
         }
         .OwO-body {
-            display: block;
-            z-index: 10000;
+            // display: block;
+            z-index: 1000;
             font-size: 12px;
             font-family: 'Microsoft YaHei', Arial, Helvetica, sans-serif;
             color: #222;
@@ -258,6 +331,8 @@ export default {
             margin-bottom: 10px;
             width: 360px;
             position: absolute;
+            opacity: 1;
+            transition: all 0.5s;
             .el-tabs--border-card {
                 border: none;
                 border-radius: 8px;
@@ -281,7 +356,6 @@ export default {
                 font-size: 0;
                 overflow: auto;
                 word-break: break-word;
-
                 .emo {
                     display: inline-block;
                     cursor: pointer;
@@ -293,6 +367,21 @@ export default {
                     }
                 }
             }
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+                background-color: #fff;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #fce518;
+                border-radius: 25px;
+                border: 0.1px solid #fff;
+            }
+        }
+
+        .body-show {
+            opacity: 0;
+            z-index: 0;
         }
     }
 }

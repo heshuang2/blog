@@ -7,21 +7,21 @@
             <div class="board-main">
                 <div class="message-card-item" v-for="(item, index) in newMessage" :key="index">
                     <span class="message-card-avatar">
-                        <img src="../../assets/img/007.jpg" alt="" />
+                        <img :src="item.user.avatar" alt="" />
                     </span>
                     <div class="message-card-body">
                         <span class="message-card-title">
-                            <ul class="text-dark fs-sm">
-                                {{item.name}}
-                            </ul>
+                            <router-link :to="`/user/${item.user.account}`" class="text-dark fs-sm">
+                                {{ item.user.name }}
+                            </router-link>
                             <ul class="text-grey fs-xs">
-                                {{item.datetime | playTimeFormat}}
+                                {{
+                                    item.datetime | playTimeFormat
+                                }}
                             </ul>
                         </span>
                         <span class="message-card-content">
-                            <ul class="fs-sm">
-                               {{item.content}}
-                            </ul>
+                            <ul class="fs-sm" v-html="utils.Emoji(item.message)"></ul>
                         </span>
                     </div>
                 </div>
@@ -42,8 +42,16 @@ export default {
     },
     methods: {
         async getNewMessage() {
-            const { data: res } = await this.$http2.get('/rest/Message');
-            this.newMessage = res;
+            const { data: res } = await this.$http2.get('rest/messages/', {
+                params: {
+                    skip: 1,
+                    limit: 3
+                },
+                paramsSerializer: (params) => {
+                    return this.$qs.stringify(params, { indices: false });
+                }
+            });
+            this.newMessage = res.data;
         }
     }
 };
@@ -59,7 +67,7 @@ export default {
         padding: 5px;
         .message-card-avatar {
             height: 100%;
-            // width: 27%;
+            width: 20%;
             display: flex;
             align-items: center;
             float: left;
@@ -73,7 +81,7 @@ export default {
         }
         .message-card-body {
             display: table-cell;
-            width: 73%;
+            width: 50%;
             height: 4.375rem;
             vertical-align: middle;
             .message-card-title {
@@ -84,9 +92,16 @@ export default {
                 width: 100%;
                 height: 1.5625rem;
                 overflow: hidden;
+                a {
+                    color: #fb7299 !important;
+                    outline: none;
+                    text-decoration: none;
+                    cursor: pointer;
+                }
             }
             .message-card-content {
                 display: flex;
+                align-items: center;
             }
         }
     }

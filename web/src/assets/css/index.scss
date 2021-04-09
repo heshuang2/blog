@@ -6,20 +6,38 @@ html {
     font-size: 16px;
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.5em;
-    min-width: 800px;
     margin: 0;
     padding: 0;
+    min-height: 100%;
     height: 100%;
+    -webkit-overflow-scrolling: touch;
+    // width: 100%;
+}
+body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #fce518;
+    border-radius: 25px;
+    border: 0.1px solid #fff;
+}
+a {
+    text-decoration: none;
+    list-style: none;
+    color: #000;
 }
 
 $colors: ('primary': rgb(252, 229, 24),
     'white': #fff,
-    'light': #f9f9f9,
-    'grey': #999,
+    'light': #f6f6f6,
+    'grey': #ccc,
     'dark': #222,
     'black': #000,
-    'danger': rgba(255, 0, 0, 0.671)
-    );
+    'danger': rgba(255, 0, 0, 0.671));
+$fonts: ('a': 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif');
 
 @each $colorKey,
 $color in $colors {
@@ -38,6 +56,14 @@ $color in $colors {
     }
 }
 
+@each $familyKey,
+$font in $fonts {
+    .font-#{$familyKey} {
+        font-family: $font;
+    }
+}
+
+
 $base-font-size: 1rem;
 $font-sizes: (xs: 0.625,
     //10px
@@ -47,8 +73,7 @@ $font-sizes: (xs: 0.625,
     lg: 1.1875,
     //19px
     xl: 1.375, //22px
-    xxl: 1.625
-);
+    xxl: 1.625);
 
 @each $sizeKey,
 $size in $font-sizes {
@@ -112,6 +137,7 @@ $type in $spacing-types {
         }
     }
 }
+
 .ripple {
     position: relative;
     //隐藏溢出的径向渐变背景
@@ -145,6 +171,7 @@ $type in $spacing-types {
     //设置初始状态
     transition: 0s;
 }
+
 .dialog-btn {
     height: 32px;
     width: 60px;
@@ -153,9 +180,10 @@ $type in $spacing-types {
     border: none;
     border-radius: 1em;
 }
+
 #app {
-    min-width: 600px;
-    height: 100%;
+    // min-width: 600px;
+    // height: 100%;
 }
 
 .lizi {
@@ -168,7 +196,7 @@ $type in $spacing-types {
 
 #top {
     display: flex;
-    height: 50px;
+    height: 52px;
     padding: 0;
     margin: 0;
     background: #fff;
@@ -188,47 +216,52 @@ $type in $spacing-types {
 }
 
 .main {
-    display: flex;
+    // padding: 0 20px;
+    margin: auto;
     position: relative;
-    margin-left: 15%;
-    margin-right: 15%;
-    // width: 100%;
     min-height: 100%;
-    padding-bottom: 50px;
+    padding: 60px 0;
 
     .center {
-        position: relative;
-        order: 2;
-        min-width: 540px;
-        flex: 1;
         box-sizing: border-box;
-        padding: 0 20px;
-        padding-top: 60px;
+        position: relative;
+        box-sizing: border-box;
     }
 
     #left {
-        position: relative;
-        order: 1;
-        // padding-left: 12%;
-        padding-top: 50px;
+        box-sizing: border-box;
+        // padding-top: 950px;
+        // position: relative;
+        flex: 0 0 33.3333333333%;
+        max-width: 33.3333333333%;
+        padding-left: 20px;
     }
 }
+
+.container {
+    margin: auto;
+    position: relative;
+    box-sizing: border-box;
+}
+
 .page {
     box-sizing: border-box;
-    padding: 50px 40px;
+    padding: 40px 40px;
     border-radius: 8px;
     box-shadow: 0 4px 8px 6px rgba(7, 17, 27, 0.06);
     min-height: 92%;
     position: relative;
     // top: 60px;
     // margin-bottom: 100px;
-    margin: 0 20%;
+    // margin: 0 20%;
 }
+
 .page:hover {
     box-shadow: 0 4px 12px 12px rgba(7, 17, 27, 0.15);
 }
-@media all and (max-width: 600px) {
-    /* Too narrow to support three columns */
+
+/* @media all and (max-width: 600px) {
+
 
     .main {
         flex-flow: column;
@@ -237,13 +270,12 @@ $type in $spacing-types {
     .main .center,
     .main .left,
     .main .right {
-        /* Return them to document order */
 
         order: 0;
         width: auto;
     }
 }
-
+ */
 #backtop {
     position: fixed;
     right: 20px;
@@ -271,8 +303,13 @@ $type in $spacing-types {
     bottom: 100px;
 }
 
+.wrap-box {
+    box-sizing: border-box;
+    padding-bottom: .625rem;
+}
+
 .el-card {
-    margin-top: .625rem;
+    margin-bottom: .625rem;
     border-radius: 1rem;
     -webkit-border-radius: 1rem;
     -moz-border-radius: 1rem;
@@ -305,11 +342,84 @@ $type in $spacing-types {
 
 .el-dropdown-menu__item:focus,
 .el-dropdown-menu__item:not(.is-disabled):hover {
-        background-color: #000;
-        color: rgb(252, 229, 24);
+    background-color: #000;
+    color: rgb(252, 229, 24);
 }
 
 .burl {
-    /* position: fixed; */
-    width: 300px;
+    position: relative;
+    // width: 350px;
+    // animation: moveup 5s;
+    // -webkit-animation: moveup 2s;
+}
+
+.el-message-box {
+    animation: dialogOpen 2s;
+}
+
+.flex-middle-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 21px;
+    height: 66px;
+    padding: 0 20px;
+
+    .title {
+        font-weight: 800;
+        letter-spacing: 0.0125em !important;
+    }
+}
+
+.fade {
+    animation: moveup 0.6s;
+}
+
+.loadding {
+    position: fixed;
+    // color: black;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 9999;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .loadding-icon {
+        //margin: 0 auto;
+        animation: corners 1s linear infinite;
+        font-size: 80px;
+        -webkit-animation: corners 1s linear infinite;
+    }
+}
+
+.is_fixed {
+    position: fixed !important;
+    top: 60px;
+    max-width: 350px;
+}
+
+// 标签
+.tag-wrap {
+    filter: drop-shadow(-1px 6px 3px rgba(50, 50, 0, 0.5));
+    padding: 8px;
+
+    .tag {
+        background: #fb8c00;
+        border-radius: 3px;
+        color: #222;
+        padding: 5px 10px 5px 15px;
+        font: bold 15px system-ui;
+        clip-path: polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0 50%);
+        text-align: center;
+    }
+}
+.open {
+    display: block;
+}
+.close {
+    display: none !important;
 }

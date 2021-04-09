@@ -21,12 +21,12 @@
                 </el-table-column>
                 <el-table-column label="昵称" align="center" width="200px">
                     <template slot-scope="scope">
-                        <el-tag type="success">{{ scope.row.name }}</el-tag>
+                        <el-tag type="success">{{ scope.row.user.name }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="内容" header-align="center" :show-overflow-tooltip="true">
                     <template slot-scope="scope">
-                        <span>{{ scope.row.content }}</span>
+                        <span>{{ scope.row.message }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column flexd="right" label="操作" width="180" align="center">
@@ -49,7 +49,7 @@
                 </el-table-column>
             </el-table>
             <el-pagination
-                style="margin-top: .625rem"
+                style="margin-top: 0.625rem"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :total="comments.length"
@@ -67,15 +67,20 @@
                     </div>
                     <el-form label-width="3rem" label-position="left" @submit.native.prevent="save(model._id)">
                         <el-form-item label="文章">
-                        <el-select v-model="model.article"  value-key="name" placeholder="请选择" style="width: 100%">
-                            <el-option
-                                v-for="item of articles"
-                                :key="item._id"
-                                :label="item.title"
-                                :value="item"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
+                            <el-select
+                                v-model="model.article"
+                                value-key="name"
+                                placeholder="请选择"
+                                style="width: 100%"
+                            >
+                                <el-option
+                                    v-for="item of articles"
+                                    :key="item._id"
+                                    :label="item.title"
+                                    :value="item"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
                         <el-form-item label="昵称">
                             <el-input placeholder="请输入内容" v-model="model.name"> </el-input>
                         </el-form-item>
@@ -89,9 +94,15 @@
                             >
                             </el-input>
                         </el-form-item>
-                        <el-form-item label="回复" v-for="(item, index) in model.children" :key="index"> 
-                            <el-tag style="width: 18%" effect="plain">{{item.name}}</el-tag>
-                            <el-input type="textarea" style="width: 80%; float: right;" autosize placeholder="请输入内容" v-model="item.content">
+                        <el-form-item label="回复" v-for="(item, index) in model.children" :key="index">
+                            <el-tag style="width: 18%" effect="plain">{{ item.name }}</el-tag>
+                            <el-input
+                                type="textarea"
+                                style="width: 80%; float: right"
+                                autosize
+                                placeholder="请输入内容"
+                                v-model="item.content"
+                            >
                             </el-input>
                         </el-form-item>
                         <el-form-item style="float: right">
@@ -126,6 +137,7 @@ export default {
         // 请求数据
         async fetch() {
             const res = await this.$http.get('rest/comments'); // eslint-disable-line no-unused-vars
+            console.log(res.data);
             this.comments = res.data;
         },
         // 删除
@@ -177,26 +189,26 @@ export default {
         // 获取文章列表
         async fetchArticles() {
             const { data: res } = await this.$http.get(`rest/articles`); // eslint-disable-line no-unused-vars
-            this.articles = Array.from(res, ({_id, title}) => {
-                return {_id, title}
-            })
-            console.log(this.articles);
+            this.articles = Array.from(res, ({ _id, title }) => {
+                return { _id, title };
+            });
+            // console.log(this.articles);
         },
         isClose(done) {
             this.$confirm('确认关闭？')
-                .then(_ => {
+                .then((_) => {
                     done();
                 })
-                .catch(_ => {});
+                .catch((_) => {});
         },
         newDialog() {
             this.model = {};
             this.isEdit = false;
         },
-        handleSizeChange: function(val) {
+        handleSizeChange: function (val) {
             this.pagesize = val;
         },
-        handleCurrentChange: function(currentPage) {
+        handleCurrentChange: function (currentPage) {
             this.currentPage = currentPage;
         }
     }

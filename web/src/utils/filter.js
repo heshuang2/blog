@@ -1,11 +1,12 @@
 
 const filters = {
-    playTimeFormat: function(date) {
+    playTimeFormat: function(date, len) {
         var dateee = new Date(date).toJSON();
         return new Date(+new Date(dateee) + 8 * 3600 * 1000)
             .toISOString()
             .replace(/T/g, ' ')
-            .replace(/\.[\d]{3}Z/, '');
+            .replace(/\.[\d]{3}Z/, '')
+            .substr(0, len);
     },
     /**
      *  js中字符串超长作固定长度加省略号（...）处理

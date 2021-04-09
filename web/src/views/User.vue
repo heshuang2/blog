@@ -1,273 +1,313 @@
 <template>
     <div id="user">
-        <div class="user-card">
-            <div class="page bg-white">
-                <div class="user-background"></div>
-                <div class="user-item-flex">
-                    <div class="user-avatar">
-                        <img :src="user.avatar" alt="" />
-                        <div class="user-avatar-change" v-if="isLogin">
-                            <div class="avatar-background"></div>
-                            <svg-icon icon-class="upload" class="avatar-svg"></svg-icon>
-                            <span class="avatar-UploadPicture text-white">修改我的头像</span>
+        <div class="container">
+            <div class="user-card">
+                <div class="page bg-white">
+                    <div class="user-background"></div>
+                    <div class="user-item-flex">
+                        <div class="user-avatar">
+                            <img :src="user.avatar" alt="" />
+                            <div class="user-avatar-change" v-if="isLogin">
+                                <div class="avatar-background"></div>
+                                <svg-icon icon-class="upload" class="avatar-svg"></svg-icon>
+                                <span class="avatar-UploadPicture text-white">修改我的头像</span>
+                            </div>
+                            <input
+                                type="file"
+                                v-if="isLogin"
+                                accept="image/*"
+                                @change="handleFile"
+                                class="UploadPicture-input"
+                            />
                         </div>
-                        <input
-                            type="file"
-                            v-if="isLogin"
-                            accept="image/*"
-                            @change="handleFile"
-                            class="UploadPicture-input"
-                        />
-                    </div>
-                    <div class="user-item-column">
-                        <div class="user-name">
-                            <div class="name-text" v-if="this.switch.name">
-                                <div class="fs-xxl text-white user-name-text">{{ user.name }}</div>
-                                <button v-if="isChange" class="change-btn ripple" @click="changeContent('name')">
-                                    <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
-                                </button>
-                            </div>
-                            <div class="user-item-change" v-else="!switch.name">
-                                <div class="user-change-main">
-                                    <textarea class="user-input" rows="2" v-model="changeUser.name"></textarea>
-                                </div>
-                                <div class="user-change-btn">
-                                    <button class="change-close-btn ripple" @click="closeChange('name')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="close" class="edit-svg"></svg-icon>
-                                        </span>
-                                    </button>
-                                    <button class="change-save-btn ripple" @click="saveChange('name')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="save"></svg-icon>
-                                        </span>
+                        <div class="user-item-column">
+                            <div class="user-name">
+                                <div class="name-text" v-if="this.switch.name">
+                                    <div class="fs-xxl text-white user-name-text">{{ user.name }}</div>
+                                    <button v-if="isChange" class="change-btn ripple" @click="changeContent('name')">
+                                        <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="user-jurisdiction">
-                            <span class="dec-text" v-if="user.jurisdiction">{{ user.jurisdiction.name }}</span>
-                        </div>
-                        <div class="user-description">
-                            <div class="text-grey desc-text" v-if="this.switch.desc">
-                                <div class="user-desc">{{ user.desc }}</div>
-                                <button v-if="isChange" class="change-btn ripple" @click="changeContent('desc')">
-                                    <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
-                                </button>
-                            </div>
-                            <div class="user-item-change" v-else="!switch.desc">
-                                <div class="user-change-main">
-                                    <textarea class="user-input" rows="2" v-model="changeUser.desc"></textarea>
-                                </div>
-                                <div class="user-change-btn">
-                                    <button class="change-close-btn ripple" @click="closeChange('desc')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="close" class="edit-svg"></svg-icon>
-                                        </span>
-                                    </button>
-                                    <button class="change-save-btn ripple" @click="saveChange('desc')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="save"></svg-icon>
-                                        </span>
-                                    </button>
+                                <div class="user-item-change" v-else="!switch.name">
+                                    <div class="user-change-main">
+                                        <textarea class="user-input" rows="2" v-model="changeUser.name"></textarea>
+                                    </div>
+                                    <div class="user-change-btn">
+                                        <button class="change-close-btn ripple" @click="closeChange('name')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="close" class="edit-svg"></svg-icon>
+                                            </span>
+                                        </button>
+                                        <button class="change-save-btn ripple" @click="saveChange('name')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="save"></svg-icon>
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div v-if="isLogin" class="user-btn">
-                        <button
-                            class="ripple"
-                            :class="[isChange ? 'bg-danger' : 'bg-primary']"
-                            :disabled="disable"
-                            @click="toggleUser"
-                        >
-                            {{ isChange ? '退出编辑模式' : '编辑个人资料' }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="user-main">
-            <div class="page user-page-left bg-white">
-                <div class="user-left-title">
-                    <h3>个人资料</h3>
-                </div>
-                <div class="user-left-main">
-                    <el-form :model="user">
-                        <div class="user-messages">
-                            <div class="user-messages-left">
-                                <span class="user-message-label">邮箱</span>
+                            <div class="user-jurisdiction">
+                                <span class="dec-text" v-if="user.jurisdiction">{{ user.jurisdiction.name }}</span>
                             </div>
-                            <div class="user-messages-right" v-if="this.switch.email">
-                                <span class="user-message-text">{{ user.email ? user.email : '-' }}</span>
-                                <button
-                                    v-if="isChange"
-                                    name="email"
-                                    type="button"
-                                    class="change-btn ripple"
-                                    @click="changeContent('email')"
-                                >
-                                    <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
-                                </button>
-                            </div>
-                            <div class="user-item-change" v-else="!switch.email">
-                                <div class="user-main-change-btn">
-                                    <button class="change-close-btn ripple" @click="closeChange('email')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="close" class="edit-svg"></svg-icon>
-                                        </span>
-                                    </button>
-                                    <button type="button" class="change-save-btn ripple" @click="saveChange('email')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="save"></svg-icon>
-                                        </span>
+                            <div v-if="!this.$store.state.mobile" class="user-description">
+                                <div class="text-grey desc-text" v-if="this.switch.desc">
+                                    <div class="user-desc">{{ user.desc }}</div>
+                                    <button v-if="isChange" class="change-btn ripple" @click="changeContent('desc')">
+                                        <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
                                     </button>
                                 </div>
-                                <div class="user-main-change-main">
-                                    <textarea class="user-input" rows="1" v-model="changeUser.email"></textarea>
+                                <div class="user-item-change" v-else="!switch.desc">
+                                    <div class="user-change-main">
+                                        <textarea class="user-input" rows="2" v-model="changeUser.desc"></textarea>
+                                    </div>
+                                    <div class="user-change-btn">
+                                        <button class="change-close-btn ripple" @click="closeChange('desc')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="close" class="edit-svg"></svg-icon>
+                                            </span>
+                                        </button>
+                                        <button class="change-save-btn ripple" @click="saveChange('desc')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="save"></svg-icon>
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="user-messages">
-                            <div class="user-messages-left">
-                                <span class="user-message-label">注册时间</span>
-                            </div>
-                            <div class="user-messages-right">
-                                <span class="user-message-text">{{ user.datetime | playTimeFormat }}</span>
-                            </div>
-                        </div>
-                        <div class="user-messages">
-                            <div class="user-messages-left">
-                                <span class="user-message-label">手机号</span>
-                            </div>
-                            <div class="user-messages-right" v-if="this.switch.tel">
-                                <span class="user-message-text">{{ user.tel ? user.tel : '-' }}</span>
-                                <button
-                                    v-if="isChange"
-                                    name="tel"
-                                    type="button"
-                                    class="change-btn ripple"
-                                    @click="changeContent('tel')"
-                                >
-                                    <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
-                                </button>
-                            </div>
-                            <div class="user-item-change" v-else="!switch.tel">
-                                <div class="user-main-change-btn">
-                                    <button class="change-close-btn ripple" @click="closeChange('tel')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="close" class="edit-svg"></svg-icon>
-                                        </span>
-                                    </button>
-                                    <button type="button" class="change-save-btn ripple" @click="saveChange('tel')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="save"></svg-icon>
-                                        </span>
-                                    </button>
-                                </div>
-                                <div class="user-main-change-main">
-                                    <textarea class="user-input" rows="1" v-model="changeUser.tel"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="user-messages">
-                            <div class="user-messages-left">
-                                <span class="user-message-label">性别</span>
-                            </div>
-                            <div class="user-messages-right" v-if="this.switch.sex">
-                                <span class="user-message-text">{{ user.sex ? user.sex : '-' }}</span>
-                                <button
-                                    v-if="isChange"
-                                    name="sex"
-                                    type="button"
-                                    class="change-btn ripple"
-                                    @click="changeContent('sex')"
-                                >
-                                    <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
-                                </button>
-                            </div>
-                            <div class="user-item-change" v-else="!switch.sex">
-                                <div class="user-main-change-btn">
-                                    <button class="change-close-btn ripple" @click="closeChange('sex')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="close" class="edit-svg"></svg-icon>
-                                        </span>
-                                    </button>
-                                    <button type="button" class="change-save-btn ripple" @click="saveChange('sex')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="save"></svg-icon>
-                                        </span>
-                                    </button>
-                                </div>
-                                <div class="user-main-change-check">
-                                    <el-radio-group v-model="changeUser.sex" size="mini" fill="#607d8b">
-                                        <el-radio-button label="男"></el-radio-button>
-                                        <el-radio-button label="女"></el-radio-button>
-                                    </el-radio-group>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="user-messages">
-                            <div class="user-messages-left">
-                                <span class="user-message-label">年龄</span>
-                            </div>
-                            <div class="user-messages-right" v-if="this.switch.age">
-                                <span class="user-message-text">{{ user.age ? user.age : '-' }}</span>
-                                <button
-                                    v-if="isChange"
-                                    name="age"
-                                    type="button"
-                                    class="change-btn ripple"
-                                    @click="changeContent('age')"
-                                >
-                                    <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
-                                </button>
-                            </div>
-                            <div class="user-item-change" v-else="!switch.age">
-                                <div class="user-main-change-btn">
-                                    <button class="change-close-btn ripple" @click="closeChange('age')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="close" class="edit-svg"></svg-icon>
-                                        </span>
-                                    </button>
-                                    <button type="button" class="change-save-btn ripple" @click="saveChange('age')">
-                                        <span class="change-border">
-                                            <svg-icon icon-class="save"></svg-icon>
-                                        </span>
-                                    </button>
-                                </div>
-                                <div class="user-main-change-check">
-                                    <el-input-number
-                                        v-model="changeUser.age"
-                                        controls-position="right"
-                                        :min="1"
-                                        :max="150"
-                                        size="small"
-                                    ></el-input-number>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="user-messages">
-                            <div class="user-messages-left">
-                                <span class="user-message-label">位置</span>
-                                <span class="user-message-text">{{ user.seat ? user.seat : '-' }}</span>
-                            </div>
-                            <button v-if="isChange" type="button" class="change-btn ripple" @click="changeContent">
-                                <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
+                        <div v-if="isLogin && !this.$store.state.mobile" class="user-btn">
+                            <button
+                                class="ripple"
+                                :class="[isChange ? 'bg-danger' : 'bg-primary']"
+                                :disabled="disable"
+                                @click="toggleUser"
+                            >
+                                {{ isChange ? '退出编辑模式' : '编辑个人资料' }}
                             </button>
                         </div>
-                    </el-form>
+                    </div>
                 </div>
             </div>
-            <div class="page user-page-right bg-white"></div>
+            <div class="user-main" v-if="!this.$store.state.mobile">
+                <div class="page user-page-left bg-white">
+                    <div class="user-left-title">
+                        <h3>个人资料</h3>
+                    </div>
+                    <div class="user-left-main">
+                        <el-form :model="user">
+                            <div class="user-messages">
+                                <div class="user-messages-left">
+                                    <span class="user-message-label">邮箱</span>
+                                </div>
+                                <div class="user-messages-right" v-if="this.switch.email">
+                                    <span class="user-message-text">{{ user.email ? user.email : '-' }}</span>
+                                    <button
+                                        v-if="isChange"
+                                        name="email"
+                                        type="button"
+                                        class="change-btn ripple"
+                                        @click="changeContent('email')"
+                                    >
+                                        <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
+                                    </button>
+                                </div>
+                                <div class="user-item-change" v-else="!switch.email">
+                                    <div class="user-main-change-btn">
+                                        <button class="change-close-btn ripple" @click="closeChange('email')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="close" class="edit-svg"></svg-icon>
+                                            </span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="change-save-btn ripple"
+                                            @click="saveChange('email')"
+                                        >
+                                            <span class="change-border">
+                                                <svg-icon icon-class="save"></svg-icon>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="user-main-change-main">
+                                        <textarea class="user-input" rows="1" v-model="changeUser.email"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-messages">
+                                <div class="user-messages-left">
+                                    <span class="user-message-label">注册时间</span>
+                                </div>
+                                <div class="user-messages-right">
+                                    <span class="user-message-text">{{ user.datetime | playTimeFormat }}</span>
+                                </div>
+                            </div>
+                            <div class="user-messages">
+                                <div class="user-messages-left">
+                                    <span class="user-message-label">手机号</span>
+                                </div>
+                                <div class="user-messages-right" v-if="this.switch.tel">
+                                    <span class="user-message-text">{{ user.tel ? user.tel : '-' }}</span>
+                                    <button
+                                        v-if="isChange"
+                                        name="tel"
+                                        type="button"
+                                        class="change-btn ripple"
+                                        @click="changeContent('tel')"
+                                    >
+                                        <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
+                                    </button>
+                                </div>
+                                <div class="user-item-change" v-else="!switch.tel">
+                                    <div class="user-main-change-btn">
+                                        <button class="change-close-btn ripple" @click="closeChange('tel')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="close" class="edit-svg"></svg-icon>
+                                            </span>
+                                        </button>
+                                        <button type="button" class="change-save-btn ripple" @click="saveChange('tel')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="save"></svg-icon>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="user-main-change-main">
+                                        <textarea class="user-input" rows="1" v-model="changeUser.tel"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-messages">
+                                <div class="user-messages-left">
+                                    <span class="user-message-label">性别</span>
+                                </div>
+                                <div class="user-messages-right" v-if="this.switch.sex">
+                                    <span class="user-message-text">{{ user.sex ? user.sex : '-' }}</span>
+                                    <button
+                                        v-if="isChange"
+                                        name="sex"
+                                        type="button"
+                                        class="change-btn ripple"
+                                        @click="changeContent('sex')"
+                                    >
+                                        <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
+                                    </button>
+                                </div>
+                                <div class="user-item-change" v-else="!switch.sex">
+                                    <div class="user-main-change-btn">
+                                        <button class="change-close-btn ripple" @click="closeChange('sex')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="close" class="edit-svg"></svg-icon>
+                                            </span>
+                                        </button>
+                                        <button type="button" class="change-save-btn ripple" @click="saveChange('sex')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="save"></svg-icon>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="user-main-change-check">
+                                        <el-radio-group v-model="changeUser.sex" size="mini" fill="#607d8b">
+                                            <el-radio-button label="男"></el-radio-button>
+                                            <el-radio-button label="女"></el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-messages">
+                                <div class="user-messages-left">
+                                    <span class="user-message-label">年龄</span>
+                                </div>
+                                <div class="user-messages-right" v-if="this.switch.age">
+                                    <span class="user-message-text">{{ user.age ? user.age : '-' }}</span>
+                                    <button
+                                        v-if="isChange"
+                                        name="age"
+                                        type="button"
+                                        class="change-btn ripple"
+                                        @click="changeContent('age')"
+                                    >
+                                        <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
+                                    </button>
+                                </div>
+                                <div class="user-item-change" v-else="!switch.age">
+                                    <div class="user-main-change-btn">
+                                        <button class="change-close-btn ripple" @click="closeChange('age')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="close" class="edit-svg"></svg-icon>
+                                            </span>
+                                        </button>
+                                        <button type="button" class="change-save-btn ripple" @click="saveChange('age')">
+                                            <span class="change-border">
+                                                <svg-icon icon-class="save"></svg-icon>
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="user-main-change-check">
+                                        <el-input-number
+                                            v-model="changeUser.age"
+                                            controls-position="right"
+                                            :min="1"
+                                            :max="150"
+                                            size="small"
+                                        ></el-input-number>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-messages">
+                                <div class="user-messages-left">
+                                    <span class="user-message-label">位置</span>
+                                    <span class="user-message-text">{{ user.seat ? user.seat : '-' }}</span>
+                                </div>
+                                <button v-if="isChange" type="button" class="change-btn ripple" @click="changeContent">
+                                    <svg-icon icon-class="edit" class="edit-svg"></svg-icon>
+                                </button>
+                            </div>
+                        </el-form>
+                    </div>
+                </div>
+                <div class="page user-page-right bg-white"></div>
+            </div>
+            <div v-else class="user-main-h5">
+                <div v-if="isLogin" class="user-main-item">
+                    <span class="user-mian-item-left text-grey">
+                        <svg-icon iconClass="user" class="item-info-icon"></svg-icon>
+                    </span>
+                    <span class="user-mian-item-desc font-a" @click="isEdit = true"
+                        >点击完善资料
+                        <svg-icon iconClass="info" class="item-info-icon"></svg-icon>
+                    </span>
+                </div>
+                <div class="user-main-item">
+                    <span class="user-mian-item-left text-grey">个性签名 </span>
+                    <span class="user-mian-item-desc font-a">{{ user.desc ? user.desc : '-' }} </span>
+                </div>
+                <div class="user-main-item">
+                    <span class="user-mian-item-left text-grey">性别 </span>
+                    <span class="user-mian-item-desc font-a">{{ user.sex ? user.sex : '-' }} </span>
+                </div>
+                <div class="user-main-item">
+                    <span class="user-mian-item-left text-grey">年龄 </span>
+                    <span class="user-mian-item-desc font-a">{{ user.age ? user.age : '-' }} </span>
+                </div>
+                <div class="user-main-item">
+                    <span class="user-mian-item-left text-grey">注册时间 </span>
+                    <span class="user-mian-item-desc font-a">{{ user.datetime | playTimeFormat }} </span>
+                </div>
+                <div class="user-main-item">
+                    <span class="user-mian-item-left text-grey">联系方式 </span>
+                    <span class="user-mian-item-desc font-a">{{ user.email ? user.email : '-' }} </span>
+                </div>
+                <user-edit-h5 :user="user" :class="isEdit ? 'edit-content-show' : 'edit-content-close'"></user-edit-h5>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import UserEditH5 from '../components/h5_components/userEdit_h5/userEdit_h5.vue';
 import SvgIcon from '../components/SvgIcon/SvgIcon.vue';
 export default {
-    components: { SvgIcon },
+    components: { SvgIcon, UserEditH5 },
+
     data() {
         return {
             user: {},
@@ -284,8 +324,13 @@ export default {
                 tel: true,
                 sex: true,
                 age: true
-            }
+            },
+            // H5修改资料
+            isEdit: false
         };
+    },
+    created() {
+        this.utils.initializeFlag();
     },
     mounted() {
         this.getUserInfo();
@@ -310,16 +355,19 @@ export default {
                     this.isLogin = true;
                 }
             }
+            console.log(res);
         },
         async handleFile(e) {
             let $target = e.target || e.srcElement;
             let $file = $target.files[0];
-            const formdata = new FormData();
-            formdata.append('file', $file);
-            const res = await this.$http2.post('upload', formdata);
-            this.user.avatar = res.data.url;
-            console.log(this.user);
-            this.editUser(this.user);
+            if ($file) {
+                const formdata = new FormData();
+                formdata.append('file', $file);
+                const res = await this.$http2.post('upload', formdata);
+                this.user.avatar = res.data.url;
+                // console.log(this.user);
+                this.editUser(this.user);
+            }
         },
         async editUser(user) {
             const res = await this.$http2.put(`rest/users/${this.user._id}`, user);
@@ -349,6 +397,9 @@ export default {
 <style lang="scss">
 #user {
     height: 90%;
+    .container {
+        padding-top: 60px;
+    }
     .user-item-change {
         // width: 80%;
         .user-main-change-main {
@@ -457,7 +508,8 @@ export default {
         background-color: #dff0ff;
     }
     .user-card {
-        padding: 60px 0 10px 0;
+        padding: 0 10px;
+        box-sizing: border-box;
         // height: 350px;
         .page {
             box-sizing: border-box;
@@ -485,8 +537,10 @@ export default {
                     width: 200px;
                     margin-left: 10px;
                     img {
+                        width: 200px;
                         height: 200px;
                         border-radius: 5%;
+                        object-fit: cover;
                     }
                     .UploadPicture-input {
                         position: absolute;
@@ -611,7 +665,7 @@ export default {
         }
     }
     .user-main {
-        margin: 0 20%;
+        padding: 10px;
         .page {
             float: left;
             margin: 0;
