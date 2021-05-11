@@ -1,6 +1,10 @@
 .mobile {
     min-height: 100vh;
 
+    html {
+        touch-action: manipulation;
+    }
+
     html,
     body,
     form,
@@ -31,6 +35,17 @@
 
     .main {
         padding: 5rem 1.5rem;
+        position: relative;
+        box-sizing: border-box;
+
+        .bg-main {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+
+        }
 
         #swiper-card {
             min-height: 85vh;
@@ -66,7 +81,7 @@
     }
 
     .page {
-        padding: 1.5rem;
+        padding: 1rem;
         border-radius: 0;
         -webkit-border-radius: 0;
         -moz-border-radius: 0;
@@ -78,7 +93,7 @@
     #post {
         .post-main {
             padding: 0;
-            padding: 3.25rem 0;
+            padding: 3rem 0;
 
             .page-title {
                 .title {
@@ -117,7 +132,13 @@
         min-height: 100vh;
 
         .message-main {
-            padding: 3.25rem 0;
+            padding: 3rem 0;
+
+            .message-title-h {
+                padding: 1rem;
+                font-weight: 550;
+
+            }
         }
 
     }
@@ -224,6 +245,10 @@
     #user {
         min-height: 100vh;
 
+        .container {
+            padding-top: 3rem;
+        }
+
         .user-card {
             padding: 0;
 
@@ -265,6 +290,7 @@
         .user-main-h5 {
             padding: 1rem;
             font-size: 15px;
+
             .user-main-item {
                 position: relative;
                 margin-bottom: 1.25rem;
@@ -292,6 +318,67 @@
             }
         }
 
+
+    }
+
+    #diarys {
+        min-height: 100vh;
+
+        .diarys-main {
+            min-height: 100vh;
+            padding-top: 3.25rem;
+
+            .diarys-item {
+                margin: 1rem 0;
+                padding: 1rem;
+                border-radius: .3125rem;
+                -webkit-border-radius: .3125rem;
+                -moz-border-radius: .3125rem;
+                -ms-border-radius: .3125rem;
+                -o-border-radius: .3125rem;
+
+                .diarys-item-timer {
+                    padding: .5rem 0;
+                    border-bottom: 1px solid #ccc;
+                    font-size: 14px;
+                    display: flex;
+                    justify-content: space-between;
+
+                    .item-timer-year {
+                        font-weight: 550;
+                        font-size: 15px;
+                    }
+                }
+
+                .diarys-item-content {
+                    padding: .2rem 0;
+                    font-weight: 500;
+                    font-size: 15px;
+                }
+
+                .diarys-item-cover {
+                    padding: 1rem 0;
+
+                    img {
+                        width: 100%;
+                        object-fit: cover;
+                        border-radius: .3125rem;
+                        -webkit-border-radius: .3125rem;
+                        -moz-border-radius: .3125rem;
+                        -ms-border-radius: .3125rem;
+                        -o-border-radius: .3125rem;
+                    }
+                }
+            }
+        }
+    }
+
+    #backtop {
+        .backtop-border {
+            animation: none;
+            -webkit-animation: none;
+            opacity: 0;
+        }
 
     }
 }

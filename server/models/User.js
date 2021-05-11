@@ -50,6 +50,9 @@ const schema = new mongoose.Schema({
     },
     online: {
         type: Number
+    },
+    locking: {
+        type: Boolean
     }
 })
 

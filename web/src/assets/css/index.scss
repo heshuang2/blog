@@ -27,16 +27,21 @@ body::-webkit-scrollbar-thumb {
 a {
     text-decoration: none;
     list-style: none;
-    color: #000;
+    // color: #000;
 }
 
 $colors: ('primary': rgb(252, 229, 24),
     'white': #fff,
     'light': #f6f6f6,
+    'defule': #626675,
     'grey': #ccc,
-    'dark': #222,
+    'content': #2f3133,
+    'dark': rgb(23 29 32),
+    'pitck':#171719,
     'black': #000,
-    'danger': rgba(255, 0, 0, 0.671));
+    'danger': rgba(255, 0, 0, 0.671),
+    'coffee': #703636,
+    'brick': #833d3d);
 $fonts: ('a': 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif');
 
 @each $colorKey,

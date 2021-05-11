@@ -49,28 +49,28 @@
                 </div>
             </div>
         </div>
-        <div v-else class="mobile-header__content bg-light">
-            <div class="mobile-header">
-                <div class="mobile-header-left flex-middle">
+        <div v-else class="mobile-header__content " :class="this.$store.state.theme  ? 'bg-light' : 'bg-dark'">
+            <div class="mobile-header" :class="this.$store.state.theme  ? 'text-black' : 'text-white'">
+                <div class="mobile-header-left flex-middle" >
                     <v-touch tag="span" v-show="!isBack" class="v-badge" @tap="isTypeShow = true">
                         <svg-icon iconClass="type" class="menu-icon"></svg-icon>
                     </v-touch>
                     <v-touch tag="span" v-show="isBack" class="v-badge" @tap="$router.go(-1)">
-                        <svg-icon iconClass="back1" class="menu-icon"></svg-icon>
+                        <svg-icon :iconClass="this.$store.state.theme ? 'back1' : 'back1-dark'" class="menu-icon"></svg-icon>
                     </v-touch>
-                    <v-touch tag="span" v-show="!isPost" class="s-badge" @tap="$router.go(-1)">    
+                    <v-touch tag="span" v-show="!isPost" class="s-badge" >    
                         <span>{{this.$store.state.articleTitle | beautySub(12)}}</span>
                     </v-touch>
                 </div>
                 <div class="mobile-header-center flex-middle">
-                    <router-link v-show="isPost" :to="'/home'">
+                    <router-link v-show=" !isHome" :to="'/home'">
                         <img class="logo" src="../assets/img/logo.png" alt="" />
                     </router-link>
                 </div>
                 <div class="mobile-header-right flex-middle" @click="onSelect">
                     
                     <span class="v-badge">
-                        <svg-icon iconClass="menu" class="menu-icon"></svg-icon>
+                        <svg-icon :iconClass="$store.state.theme ? 'menu' : 'menu_dark'" class="menu-icon"></svg-icon>
                     </span>
                 </div>
             </div>
@@ -124,7 +124,8 @@ export default {
             isAsideShow: false,
             isLoad: 0,
             isBack: false,
-            isPost: false
+            isPost: false,
+            isHome: false
         };
     },
     components: {
@@ -141,13 +142,15 @@ export default {
             document.body.style.overflow = this.isAsideShow ? 'hidden' : 'inherit';
         },
         $route(to, from) {
-            this.isBack = to.name == 'home' || to.name == 'type' ? false : true;
+            this.isBack =['home', 'type'].includes(to.name) ? false : true;
             this.isPost = to.name == 'post' ? false : true;
+            this.isHome = to.name == 'home' ? false : true;
         }
     },
     mounted() {
-        this.isBack = this.$route.name == 'home' || this.$route.name == 'type' ? false : true;
+        this.isBack = ['home', 'type'].includes(this.$route.name) ? false : true;
         this.isPost = this.$route.name == 'post' ? false : true;
+        this.isHome = this.$route.name == 'home' ? false : true;
     },
     methods: {
         selectStyle(item) {
@@ -373,7 +376,7 @@ export default {
     }
     .type-content-show {
         height: 100vh;
-        background: #202020;
+        // background: #202020;
         opacity: 1;
         z-index: 1;
         transition: all 0.5s;

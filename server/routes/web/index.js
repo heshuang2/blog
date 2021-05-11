@@ -17,7 +17,6 @@ module.exports = (app) => {
     const Category = require('../../models/Category');
 
     router.get('/', async (req, res) => {
-        // console.log(req.query);
         let skip = 1,
             limit = 0;
         req.query.skip ? (skip = parseInt(req.query.skip)) : skip;
@@ -125,6 +124,7 @@ module.exports = (app) => {
         const isvalid = require('bcrypt').compareSync(password, user.password);
         // 抛出错误异常
         assert(isvalid, 422, '密码错误');
+        assert(user.locking, 423, '账号已锁定');
         // 3.返回token
         const content = {
             id: user._id
@@ -133,6 +133,7 @@ module.exports = (app) => {
         const updateUser = await User.findOne({
             account
         });
+
         const token = jwt.sign(content, app.get('secret'), {});
         res.send({
             status: 200,

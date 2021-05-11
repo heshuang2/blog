@@ -55,7 +55,7 @@ export default {
         window.onresize = () => {
             this.isMobile();
             this._isMobile();
-        };
+        };  
     },
     methods: {
         isMobile() {

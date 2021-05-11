@@ -21,7 +21,8 @@ const store = new Vuex.Store({
         device: null,
         mobile: false,
         articleTitle: '',
-        slideList: []
+        slideList: [],
+        theme: false
     },
     getters,
     mutations,
@@ -33,7 +34,8 @@ const store = new Vuex.Store({
                 return {
                     // 只储存state中的assessmentData
                     isLogin: val.isLogin,
-                    currentUser: val.currentUser
+                    currentUser: val.currentUser,
+                    theme: val.theme
                 };
             }
         })

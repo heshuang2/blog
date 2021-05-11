@@ -47,3 +47,6 @@ export const RemoveSlideList = (state, value) => {
         state.slideList.splice(flag, 1);
     }
 };
+export const handleTheme = (state, value) => {
+    state.theme = value;
+};

@@ -4,17 +4,32 @@ module.exports =  async (data, User, res, count) => {
    // 解决：遍历前使用深拷贝处理
     // const asyncModel = require('async');
     data = JSON.parse(JSON.stringify(data));
-    for (const element of data) {
-        for (const key in element.user) {
-            const model = await User.findById(element.user[key]);
-            element.user = model; 
+    console.log();
+    if (data instanceof Array) {
+        for (const element of data) {
+            for (const key in element.user) {
+                const model = await User.findById(element.user[key]);
+                element.user = model;
+            }
+            for (const item of element.children) {
+                const user = await User.findById(item.userId);
+                const userInfo = await User.findById(item.userInfoId);
+                item.user = user;
+                item.userInfo = userInfo;
+            }
         }
-        for (const item of element.children) {
+    }else {
+        for (const key in data.user) {
+            const model = await User.findById(data.user[key]);
+            data.user = model;
+        }
+        for (const item of data.children) {
             const user = await User.findById(item.userId);
             const userInfo = await User.findById(item.userInfoId);
-            item.user = user; 
-            item.userInfo = userInfo; 
+            item.user = user;
+            item.userInfo = userInfo;
         }
     }
+    
     res.send({data, count});
 };

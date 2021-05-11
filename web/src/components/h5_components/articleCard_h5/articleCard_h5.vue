@@ -1,22 +1,31 @@
 <template>
     <div class="article-content">
-        <div class="article-card bg-white" v-for="(item, index) in articles" :key="index">
+        <div
+            class="article-card"
+            :class="$store.state.theme ? 'bg-white' : 'bg-black'"
+            v-for="(item, index) in articles"
+            :key="index"
+        >
             <div class="article-img" :style="{ backgroundImage: 'url(' + item.icon + ')' }"></div>
-            <v-touch class="article-body" @tap="ariticleDetails(item._id)">
+            <v-touch
+                class="article-body"
+                :class="$store.state.theme ? 'text-black' : 'text-white'"
+                @tap="ariticleDetails(item._id)"
+            >
                 <div class="article-title">
-                    <a href="">{{ item.title }}</a>
+                    <span href="">{{ item.title }}</span>
                 </div>
                 <div class="article-time text-grey">
                     <span>{{ item.datetime | playTimeFormat(10) }}</span>
                 </div>
                 <div class="article-brief">
-                    <a>{{ item.brief | beautySub(42) }}</a>
+                    <span>{{ item.brief | beautySub(42) }}</span>
                 </div>
             </v-touch>
-            <div class="article-bar">
-                <span><svg-icon iconClass="eye" class="bar-icon"></svg-icon>{{ item.views }}</span>
-                <span><svg-icon iconClass="like" class="bar-icon"></svg-icon>1</span>
-                <span><svg-icon iconClass="message1" class="bar-icon"></svg-icon>{{item.comments.length}}</span>
+            <div class="article-bar" :class="$store.state.theme ? 'text-black' : 'text-white'">
+                <span><svg-icon :iconClass="$store.state.theme ? 'eye' : 'eye-dark'" class="bar-icon"></svg-icon>{{ item.views }}</span>
+                <!-- <span><svg-icon iconClass="like" class="bar-icon"></svg-icon>1</span> -->
+                <span><svg-icon :iconClass="$store.state.theme ? 'message1' : 'message-dark'"  class="bar-icon"></svg-icon>{{ item.comments.length }}</span>
             </div>
         </div>
     </div>
@@ -32,6 +41,7 @@ export default {
             default: () => []
         }
     },
+  
     methods: {
         ariticleDetails(id) {
             this.$router.push(`/post/${id}`);
@@ -64,7 +74,7 @@ export default {
             display: flex;
             // justify-content: center;
             align-items: center;
-            a {
+            span {
                 z-index: 2;
                 font-size: 1.25rem;
                 font-weight: 600;
@@ -91,7 +101,7 @@ export default {
                 display: flex;
                 box-sizing: border-box;
                 padding-right: 3vh;
-                color: #011111cb;
+                // color: #011111cb;
                 text-align: center;
                 font-size: 11px;
                 float: left;

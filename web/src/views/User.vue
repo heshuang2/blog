@@ -1,6 +1,6 @@
 <template>
     <div id="user">
-        <div class="container">
+        <div class="container users-main">
             <div class="user-card">
                 <div class="page bg-white">
                     <div class="user-background"></div>
@@ -88,6 +88,7 @@
                     </div>
                 </div>
             </div>
+            <!-- pc -->
             <div class="user-main" v-if="!this.$store.state.mobile">
                 <div class="page user-page-left bg-white">
                     <div class="user-left-title">
@@ -266,6 +267,7 @@
                 </div>
                 <div class="page user-page-right bg-white"></div>
             </div>
+            <!-- h5 -->
             <div v-else class="user-main-h5">
                 <div v-if="isLogin" class="user-main-item">
                     <span class="user-mian-item-left text-grey">
@@ -273,7 +275,7 @@
                     </span>
                     <span class="user-mian-item-desc font-a" @click="isEdit = true"
                         >点击完善资料
-                        <svg-icon iconClass="info" class="item-info-icon"></svg-icon>
+                        <svg-icon iconClass="info-white" class="item-info-icon"></svg-icon>
                     </span>
                 </div>
                 <div class="user-main-item">
@@ -306,14 +308,12 @@
 import UserEditH5 from '../components/h5_components/userEdit_h5/userEdit_h5.vue';
 import SvgIcon from '../components/SvgIcon/SvgIcon.vue';
 export default {
-    components: { SvgIcon, UserEditH5 },
+    components: { SvgIcon,  UserEditH5},
 
     data() {
         return {
             user: {},
             changeUser: {
-                sex: '',
-                age: ''
             },
             isLogin: false,
             isChange: false,
@@ -372,6 +372,7 @@ export default {
         async editUser(user) {
             const res = await this.$http2.put(`rest/users/${this.user._id}`, user);
             this.$store.dispatch('setUser', this.user);
+            this.changeUser = {};
         },
         toggleUser() {
             this.isChange = !this.isChange;
@@ -379,6 +380,7 @@ export default {
         closeChange($el) {
             this.switch[$el] = true;
             this.disable;
+            this.changeUser = {};
         },
         changeContent($el) {
             this.switch[$el] = false;
@@ -397,6 +399,9 @@ export default {
 <style lang="scss">
 #user {
     height: 90%;
+    .users-main {
+        display: block !important;
+    }
     .container {
         padding-top: 60px;
     }

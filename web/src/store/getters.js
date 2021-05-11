@@ -10,3 +10,4 @@ export const device = state => state.device;
 export const mobile = state => state.mobile;
 export const articleTitle = state => state.articleTitle;
 export const slideList = state => state.slideList;
+export const theme = state => state.theme;

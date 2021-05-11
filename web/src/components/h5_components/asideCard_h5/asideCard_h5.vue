@@ -1,5 +1,5 @@
 <template>
-    <div class="aside-content">
+    <div class="aside-content" :class="this.$store.state.theme ? 'bg-coffee' : 'bg-pitck'">
         <div class="aside-content-header">
             <div class="aside-avatar" @click="toUsers">
                 <div
@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <div class="aside-content-body aside-content-bar">
+        <div class="aside-content-body aside-content-bar" :class="this.$store.state.theme ? 'bg-brick' : 'bg-dark'">
             <div class="aside-content-nav">
                 <ul class="aside-nav-body">
                     <li v-for="(item, index) in linknames" :key="index" @click="current = index">
@@ -40,7 +40,18 @@
         <div class="aside-content-bottom">
             <div class="aside-group-bar aside-content-bar">
                 <svg-icon iconClass="notify" class="group-icon"></svg-icon>
-                <svg-icon iconClass="night" class="group-icon"></svg-icon>
+                <svg-icon
+                    v-show="this.$store.state.theme === true"
+                    iconClass="night"
+                    class="group-icon"
+                    @click="changeTheme(false)"
+                ></svg-icon>
+                <svg-icon
+                    v-show="this.$store.state.theme === false"
+                    iconClass="daytime"
+                    class="group-icon"
+                    @click="changeTheme(true)"
+                ></svg-icon>
             </div>
             <div class="aside-content-bar aside-content-btn">
                 <button v-if="!this.$store.state.isLogin" class="login-btn ripple" @click="dialog">登录</button>
@@ -85,12 +96,16 @@ export default {
             this.$http2.post('/logout', { account: this.$store.state.currentUser.account }).then((res) => {
                 console.log(res);
                 this.$store.dispatch('setUser', null);
-                // window.location.reload();
+                window.location.reload();
             });
         },
         toUsers() {
-            this.$router.push(`/user/${this.$store.state.currentUser.account}`);
+            this.$router.push(`/user/${ this.$store.state.isLogin ? this.$store.state.currentUser.account : 123456}`).catch((err) => {err});
             this.$parent.isAsideShow = false;
+        },
+        changeTheme(_state) {
+            let theme = _state;
+            this.$store.commit('handleTheme', theme);
         }
     }
 };
@@ -104,7 +119,7 @@ export default {
     left: -68%;
     width: 68%;
     height: 100%;
-    background: #703636;
+
     z-index: 9;
     color: #fff;
     .aside-content-bar {
@@ -112,7 +127,6 @@ export default {
         position: relative;
         bottom: 0;
         padding: 2vh;
-        background: #833d3d;
         border-radius: 2rem 2rem 0 0;
     }
     .aside-content-header {

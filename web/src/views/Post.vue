@@ -1,7 +1,7 @@
 <template>
     <div id="post">
         <div class="post-main">
-            <div class="page bg-white v-touch">
+            <div class="page v-touch"  :class="$store.state.theme ? 'bg-light text-black' : 'bg-dark text-white'">
                 <div class="page-cover">
                     <img :src="article.icon" alt="" />
                 </div>
@@ -28,8 +28,8 @@
                         <svg-icon iconClass="brief" class="brief-icon"></svg-icon>
                         <span>{{ article.brief }}</span>
                     </div>
-                </div>
-                <div class="markdown-body" v-html="article.content" v-highlight></div>
+                </div> 
+                <div class="markdown-body" :class="$store.state.theme ? 'text-black' : 'text-white'" v-html="article.content" v-highlight></div>
                 <div class="page-update text-grey fs-xs">文章最后更新于 {{ article.update | playTimeFormat }}</div>
                 <div class="comment-title">
                     <span>评论</span>
@@ -106,6 +106,7 @@ export default {
     methods: {
         // 移动端图片预览
         getImg(index) {
+            console.log(index);
             if (this.$store.state.mobile) {
                 this.$ImagePreview({
                     images: this.imageList,
@@ -135,7 +136,7 @@ export default {
                     imgs.forEach((img, index) => {
                         this.imageList.push(img.src);
                         img.addEventListener(
-                            'click',
+                            'touchend',
                             () => {
                                 this.getImg(index);
                             },

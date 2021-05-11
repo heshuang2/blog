@@ -1,12 +1,16 @@
 <template>
-    <div class="bottom-bar bg-light" :style="{ position: show ? 'relative' : 'fixed' }">
-        <div class="bottom-input bg-white" @click="messageShow">
+    <div
+        class="bottom-bar"
+        :class="$store.state.theme ? 'bg-light text-black' : 'bg-dark text-white'"
+        :style="{ position: show ? 'relative' : 'fixed' }"
+    >
+        <div class="bottom-input" :class="$store.state.theme ? 'bg-white' : 'bg-black'" @click="messageShow">
             <span class="bar-tip text-grey">输入{{ this.article ? '评论' : '留言' }}...</span>
         </div>
         <v-touch class="s-badge" @tap="toMessage" v-if="this.$route.name === 'post'">
-            <svg-icon iconClass="message1" class="menu-icon"></svg-icon>{{ this.count }}
+            <svg-icon :icon-class="this.$store.state.theme ? 'message1' : 'message-dark'" class="menu-icon"></svg-icon>{{ this.count }}
         </v-touch>
-        <van-popup class="popup-card" v-model="show" round closeable position="bottom">
+        <van-popup class="popup-card"  :class="$store.state.theme ? 'bg-light' : 'bg-dark'" v-model="show" round closeable position="bottom">
             <div class="popup-title">请输入{{ this.article ? '评论' : '留言' }}</div>
             <div class="popup-body">
                 <message-board
@@ -41,14 +45,13 @@ export default {
         return {
             show: false,
             index: null,
-            item: {},
+            item: {}
         };
     },
     mounted() {
         this.$bus.$on('bottomMessage', this.isShow);
     },
-    watch: {
-    },
+    watch: {},
     methods: {
         toMessage() {
             let height = document.querySelector('.comment-title').offsetTop;
@@ -98,7 +101,6 @@ export default {
     align-items: center;
     justify-content: space-between;
     .bottom-input {
-        background: #fff;
         width: 50%;
         height: 2rem;
         border-radius: 5rem;

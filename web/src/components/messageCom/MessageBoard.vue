@@ -14,7 +14,7 @@
                     <textarea
                         ref="inputVal"
                         class="vheader-input"
-                        :class="{ errBorder: errMsg }"
+                        :class="[{errBorder: errMsg}, $store.state.theme ? 'bg-white text-black' : 'bg-content text-white' ]"
                         :placeholder="userMessage.userInfo.name"
                         cols="30"
                         rows="3"
@@ -27,7 +27,7 @@
             </div>
             <div class="OwO-main">
                 <div class="OwO-logo">
-                    <el-button size="mini" round class="OwO-btn" @click.stop="showEmotion">
+                    <el-button size="mini" round class="OwO-btn"  :class="$store.state.theme ? 'bg-light text-black' : 'bg-dark text-white'" @click.stop="showEmotion">
                         <svg-icon icon-class="emoji"></svg-icon>
                         <span>表情</span>
                     </el-button>
@@ -274,7 +274,7 @@ export default {
                 padding: 10px;
                 resize: none;
                 border-radius: 5px;
-                background-color: #fafafa;
+                // background-color: #fafafa;
                 font-size: 15px;
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
                     'Open Sans', 'Helvetica Neue', sans-serif;
@@ -293,7 +293,7 @@ export default {
             .vheader-input:focus {
                 outline: 0;
                 border: 1px solid #87aec7;
-                background-color: #fff;
+                // background-color: #fff;
             }
         }
     }

@@ -34,14 +34,18 @@ module.exports = (app) => {
         const items = await req.Model.find().setOptions(queryOptions).limit(10);
         if (req.params.resource == 'messages' || req.params.resource == 'comments') {
             messageUser(items, User, res);
-        }else {
+        } else {
             res.send(items);
         }
     });
     //  获取资源详情接口
     router.get('/:id', async (req, res) => {
         const model = await req.Model.findById(req.params.id);
-        res.send(model);
+        if (req.params.resource == 'messages' || req.params.resource == 'comments') {
+            messageUser(model, User, res);
+        } else {
+            res.send(model);
+        }
     });
     // 删除资源接口
     router.delete('/:id', async (req, res) => {

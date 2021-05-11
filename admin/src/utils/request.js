@@ -33,9 +33,11 @@ service.interceptors.response.use(
                 type: 'error',
                 message: error.response.data.message
             });
+            localStorage.clear();
             if (error.response.status !== 200) {
                 router.push('/login');
             };
+            
         }
         return Promise.reject(error);
     }

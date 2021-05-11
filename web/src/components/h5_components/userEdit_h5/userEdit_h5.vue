@@ -18,7 +18,7 @@
             </div>
             <div class="user-edit-item font-a">
                 <span class="user-edit-item-left text-black">名字</span>
-                <span class="user-edit-item-right" @click="editItem(user.name)">
+                <span class="user-edit-item-right" @click="editItem(user.name, 'name')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.name }}
                     </span>
@@ -27,7 +27,7 @@
             </div>
             <div class="user-edit-item font-a">
                 <span class="user-edit-item-left text-black">个性签名</span>
-                <span class="user-edit-item-right" @click="editItem(user.desc)">
+                <span class="user-edit-item-right" @click="editItem(user.desc, 'desc')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.desc }}
                     </span>
@@ -36,7 +36,7 @@
             </div>
             <div class="user-edit-item font-a">
                 <span class="user-edit-item-left text-black">邮箱</span>
-                <span class="user-edit-item-right"  @click="editItem(user.email)">
+                <span class="user-edit-item-right" @click="editItem(user.email, 'email')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.email }}
                     </span>
@@ -45,7 +45,7 @@
             </div>
             <div class="user-edit-item font-a">
                 <span class="user-edit-item-left text-black">性别</span>
-                <span class="user-edit-item-right">
+                <span class="user-edit-item-right" @click="editPopup('sex')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.sex }}
                     </span>
@@ -54,7 +54,7 @@
             </div>
             <div class="user-edit-item font-a">
                 <span class="user-edit-item-left text-black">年龄</span>
-                <span class="user-edit-item-right">
+                <span class="user-edit-item-right"  @click="editPopup('age')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.age }}
                     </span>
@@ -68,14 +68,28 @@
                     <svg-icon iconClass="back1" class="menu-icon"></svg-icon>
                 </span>
                 <span>
-                    <van-button class="edit-btn" plain :disabled="value === key"  type="default">保存</van-button>
+                    <van-button
+                        class="edit-btn"
+                        plain
+                        :disabled="value === userValue"
+                        type="default"
+                        @click="saveUserItem()"
+                        >保存</van-button
+                    >
                 </span>
             </div>
             <div class="bg-white edit-item-body">
-                <van-cell-group>
-                    <van-field v-model="value" clearable />
-                </van-cell-group>
+                <van-field v-model="value" clearable />
             </div>
+            <van-popup v-model="isSex" round position="bottom">
+                <van-picker
+                    show-toolbar
+                    :columns="columns"
+                    :default-index="sexIndex"
+                    @cancel="onCancel"
+                    @confirm="onConfirm"
+                />
+            </van-popup>
         </div>
     </div>
 </template>
@@ -93,16 +107,49 @@ export default {
     data() {
         return {
             isShowEdit: false,
+            isSex: false,
             value: '',
-            key: ''
-
+            key: '',
+            userValue: '',
+            columns: ['男', '女'],
+            sexIndex: 0
         };
     },
     methods: {
-        editItem(value) {
+        editItem(value, userKey) {
             this.isShowEdit = true;
-            this.key = value;
+            this.key = userKey;
+            this.userValue = value;
             this.value = value;
+        },
+        saveUserItem() {
+            if (this.value != '') {
+                this.user[this.key] = this.value;
+                const toast = this.$Toast.loading({
+                    duration: 0
+                });
+                this.$parent.editUser(this.user).then(() => {
+                    this.isShowEdit = false;
+                    toast.clear();
+                });
+            }
+        },
+        editPopup() {
+            this.isSex = true;
+            this.sexIndex = this.user.sex === '男' ? 0 : 1;
+        },
+        onConfirm(value) {
+            this.user.sex = value;
+            const toast = this.$Toast.loading({
+                duration: 0
+            });
+            this.$parent.editUser(this.user).then(() => {
+                this.isSex = false;
+                toast.clear();
+            });
+        },
+        onCancel() {
+            this.isSex = false;
         }
     }
 };
@@ -202,7 +249,7 @@ export default {
         .edit-btn {
             border-radius: 2px;
             height: auto;
-            padding: .5rem .65rem;
+            padding: 0.5rem 0.65rem;
         }
         .edit-item-body {
             .van-cell {
@@ -217,6 +264,16 @@ export default {
     .edit-item-close {
         // animation: slide-right 0.3s;
         bottom: -100%;
+    }
+}
+.van-popup {
+    .van-picker__toolbar {
+        border-bottom: 1px solid #ccc;
+    }
+    .van-hairline-unset--top-bottom {
+        background: #ccc;
+        opacity: 0.1;
+        border-radius: 8px;
     }
 }
 .edit-content-show {

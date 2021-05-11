@@ -1,7 +1,12 @@
 <template>
     <div class="message-list-h">
         <div class="list-body-h">
-            <div class="list-content-h bg-white" v-for="(item, index) in messageLists" :key="index">
+            <div
+                class="list-content-h"
+                :class="$store.state.theme ? 'bg-white' : 'bg-content text-white'"
+                v-for="(item, index) in messageLists"
+                :key="index"
+            >
                 <div class="list-avatar-h">
                     <img :src="item.user.avatar" alt="" />
                 </div>
@@ -23,10 +28,13 @@
                     <van-button
                         v-show="item.children.length != 0"
                         class="reply-btn-h ripple"
-                        :class="!item.isDrop ? 'btn-none' : 'btn-show'"
+                        :class="[
+                            !item.isDrop ? 'btn-none' : 'btn-show',
+                            $store.state.theme ? 'bg-white' : 'bg-content text-white'
+                        ]"
                         @click="slideEnter(index, item)"
                     >
-                        <svg-icon iconClass="arrow-down"></svg-icon>
+                        <svg-icon :iconClass="$store.state.theme ? 'arrow-down' : 'arrow-down-dark'"></svg-icon>
                         展开{{ item.children.length }}条回复
                     </van-button>
                     <div ref="reply" class="list-reply-h">
@@ -39,7 +47,9 @@
                                 <div class="list-name-h reply-name-h">
                                     <span>{{ itemChild.user.name }}</span>
                                     <span v-if="itemChild.isReply" class="reply-userinfo-h">
-                                        <span class="reply-h text-black">回复</span>
+                                        <span class="reply-h" :class="$store.state.theme ? 'text-black' : 'text-white'"
+                                            >回复</span
+                                        >
                                         <span>{{ itemChild.userInfo.name }}</span>
                                     </span>
                                 </div>
@@ -60,25 +70,38 @@
                     <van-button
                         v-show="item.children.length != 0 && !item.isDrop"
                         class="reply-btn-h ripple"
+                        :class="$store.state.theme ? 'bg-white' : 'bg-content text-white'"
                         @click="slideLeave(index, item)"
                     >
-                        <svg-icon iconClass="arrow-up"></svg-icon>
+                        <svg-icon :iconClass="$store.state.theme ? 'arrow-up' : 'arrow-up-dark'"></svg-icon>
                         收起
                     </van-button>
                 </div>
             </div>
-            <div v-if="messageLists.length < count" class="list-loader" ref="loader" @click="loaderComments">
+            <div
+                v-if="messageLists.length < count"
+                class="list-loader text-defule"
+                :class="$store.state.theme ? 'bg-white' : 'bg-black'"
+                ref="loader"
+                @click="loaderComments"
+            >
                 <span v-if="isLoad">加载更多...</span>
                 <span v-else>
                     <i class="el-icon-loading"></i>
                     拼命加载中
                 </span>
             </div>
-            <div v-else class="list-null">
+            <div v-else class="list-null" :class="$store.state.theme ? 'text-black' : 'text-white'">
                 <span>没有更多了 Orz</span>
             </div>
         </div>
-        <van-popup class="popup-card" v-model="show" round position="bottom">
+        <van-popup
+            class="popup-card"
+            :class="$store.state.theme ? 'bg-white text-black' : 'bg-dark text-white'"
+            v-model="show"
+            round
+            position="bottom"
+        >
             <div class="handle">
                 <svg-icon iconClass="cut" class="cut-icon"></svg-icon>
             </div>
@@ -88,7 +111,13 @@
                     <li @click="replyMessage">回复</li>
                     <li v-if="listData.isDel" @click="delMessage">删除</li>
                 </ul>
-                <van-button type="default" class="closeBtn bg-light" @click="show = false">取消</van-button>
+                <van-button
+                    type="default"
+                    class="closeBtn"
+                    :class="$store.state.theme ? 'bg-white text-black' : 'bg-black text-white'"
+                    @click="show = false"
+                    >取消</van-button
+                >
             </div>
         </van-popup>
     </div>
@@ -318,7 +347,7 @@ export default {
                     overflow: hidden;
                     transition: height 0.3s linear;
                     position: relative;
-                      
+
                     .reply--warp-border {
                         position: absolute;
                         width: 1px;
@@ -345,7 +374,6 @@ export default {
                         .reply-msg-h {
                             position: relative;
                             overflow: hidden;
-                          
                         }
                     }
                 }
@@ -358,8 +386,8 @@ export default {
             font: 16px PingFangSC-Regular;
             text-align: center;
             line-height: 36px;
-            color: #626675;
-            background: #f5f5f6;
+            // color: #626675;
+            // background: #f5f5f6;
             border-radius: 6px;
             cursor: pointer;
         }

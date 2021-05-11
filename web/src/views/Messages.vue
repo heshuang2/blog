@@ -16,8 +16,8 @@
                     </div>
                 </div>
             </div>
-            <div v-else class="container page bg-light">
-                <div>欢迎留言</div>
+            <div v-else class="container page" :class="this.$store.state.theme ? 'bg-light' : 'bg-dark'">
+                <div class="message-title-h" :class="$store.state.theme ? 'text-black' : 'text-white'">欢迎留言</div>
                 <message-list-h5 ref="messageList" :messageLists="messageLists" :count="count"></message-list-h5>
                 <bottom-bar-h5></bottom-bar-h5>
             </div>
@@ -43,7 +43,7 @@ export default {
     },
     created() {
         this.utils.initializeFlag();
-        this.getMessageList(1, 110);
+        this.getMessageList(1, 5);
     },
     mounted() {
         this.$bus.$on('getMessageList', this.getMessageList);

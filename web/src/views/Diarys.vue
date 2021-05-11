@@ -1,6 +1,6 @@
 <template>
     <div id="diarys">
-        <div class="container diarys-body">
+        <div v-if="!this.$store.state.mobile" class="container diarys-body">
             <div class="doc-container">
                 <div class="timeline-main">
                     <!-- 时间线 -->
@@ -33,6 +33,22 @@
                 </div>
             </div>
         </div>
+        <div v-else class="container page diarys-main" :class="this.$store.state.theme ? 'bg-light' : 'bg-dark'">
+            <div
+                class="diarys-item"
+                :class="$store.state.theme ? 'bg-white' : 'bg-black'"
+                v-for="(item, index) in trivialListM"
+            >
+                <div class="diarys-item-timer text-grey">
+                    <span class="item-timer-year">{{ item.year }}</span>
+                    <span class="">{{ item.time }}</span>
+                </div>
+                <div class="diarys-item-content"  :class="$store.state.theme ? 'text-black' : 'text-white'">{{ item.content }}</div>
+                <div v-if="item.image" class="diarys-item-cover">
+                    <img v-lazy="item.image" />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -41,7 +57,8 @@ export default {
     data() {
         return {
             year: [],
-            trivialList: {}
+            trivialList: {},
+            trivialListM: []
         };
     },
     created() {
@@ -63,7 +80,8 @@ export default {
                 this.year.unshift(element);
                 this.trivialList[element] = res.data.filter((item) => element === item.year);
             });
-            // console.log(res);
+            this.trivialListM = res.data;
+            console.log(this.trivialListM);
         }
     }
 };

@@ -6,22 +6,23 @@
             </div>
             <el-table
                 :data="messages.slice((currentPage - 1) * pagesize, currentPage * pagesize)"
-                border
-                :default-sort="{ prop: 'datetime', order: 'ascending' }"
+                border  row-key="_id"  :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+                @sort-change="sortChange"
             >
-                <el-table-column label="创建时间" sortable align="center" width="200" prop="datetime">
+                <el-table-column label="创建时间" sortable='custom' align="center" width="200" 
+                prop="datetime" >
                     <template scope="scope">
                         {{ scope.row.datetime | playTimeFormat }}
                     </template>
                 </el-table-column>
-                <el-table-column label="昵称" align="center" width="200px">
+                <el-table-column label="昵称" align="center" width="200">
                     <template slot-scope="scope">
-                        <el-tag type="success">{{ scope.row.name }}</el-tag>
+                        <el-tag type="success">{{ scope.row.user.name }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="内容" header-align="center" :show-overflow-tooltip="true">
                     <template slot-scope="scope">
-                        <span>{{ scope.row.content }}</span>
+                        <span>{{ scope.row.message }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column flexd="right" label="操作" width="180" align="center">
@@ -44,7 +45,7 @@
                 </el-table-column>
             </el-table>
             <el-pagination
-                style="margin-top: .625rem"
+                style="margin-top: 0.625rem"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :total="messages.length"
@@ -60,18 +61,9 @@
                     <div slot="header" class="clearfix">
                         <span class="dialog-title">{{ isEdit ? '编辑' : '新建' }}日常</span>
                     </div>
-                    <el-form
-                        label-width="3rem"
-                        
-                        label-position="left"
-                        @submit.native.prevent="save(model._id)"
-                    >
+                    <el-form label-width="3rem" label-position="left" @submit.native.prevent="save(model._id)">
                         <el-form-item label="昵称">
-                            <el-input
-                                placeholder="请输入内容"
-                                v-model="model.name"
-                            >
-                            </el-input>
+                            <el-input v-if="model.user != null" placeholder="请输入内容" v-model="model.user.name"> </el-input>
                         </el-form-item>
                         <el-form-item label="内容">
                             <el-input
@@ -79,19 +71,12 @@
                                 autosize
                                 :rows="2"
                                 placeholder="请输入内容"
-                                v-model="model.content"
+                                v-model="model.message"
                             >
                             </el-input>
                         </el-form-item>
                         <el-form-item label="回复">
-                            <el-input
-                                type="textarea"
-                                autosize
-                                :rows="2"
-                                placeholder="请输入内容"
-                                v-model="model.content"
-                            >
-                            </el-input>
+                            <el-tag v-if="model.children != null" type="info">{{model.children.length}}</el-tag>
                         </el-form-item>
                         <el-form-item style="float: right">
                             <el-button @click="isDialog = false">取 消</el-button>
@@ -122,9 +107,10 @@ export default {
     methods: {
         // 请求数据
         async fetch() {
-            const res = await this.$http.get('rest/messages'); // eslint-disable-line no-unused-vars
+            const { data: res } = await this.$http.get('rest/messages'); // eslint-disable-line no-unused-vars
             this.messages = res.data;
-            console.log(this.messages);
+            this.messages.sort((a, b) => a.datetime < b.datetime ? 1 : -1);
+            // console.log(this.messages);
         },
         // 删除
         async remove(row) {
@@ -168,26 +154,35 @@ export default {
         // 编辑
         async edit(id) {
             const { data: res } = await this.$http.get(`rest/messages/${id}`); // eslint-disable-line no-unused-vars
-            this.model = res;
+            this.model = res.data;
             this.isDialog = true;
             this.isEdit = true;
+            console.log(this.model);
         },
         isClose(done) {
             this.$confirm('确认关闭？')
-                .then(_ => {
+                .then((_) => {
                     done();
                 })
-                .catch(_ => {});
+                .catch((_) => {});
         },
         newDialog() {
             this.model = {};
             this.isEdit = false;
         },
-        handleSizeChange: function(val) {
+        handleSizeChange: function (val) {
             this.pagesize = val;
         },
-        handleCurrentChange: function(currentPage) {
+        handleCurrentChange: function (currentPage) {
             this.currentPage = currentPage;
+        },
+        sortChange(column) {
+            this.pageIndex = 1; // 排序后返回第一页
+            if (column.order === 'descending') {
+                this.messages.sort((a, b) => b[column.prop] - a[column.prop] ? 1 : -1 );
+            } else if (column.order === 'ascending') {
+                this.messages.sort((a, b) => a[column.prop] - b[column.prop] ? 1 : -1);
+            }
         }
     }
 };

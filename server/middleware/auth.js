@@ -14,7 +14,7 @@ module.exports = (options) => {
                     switch (err.message) {
                         case 'jwt expired':
                             res.status(403).send({
-                                message: '无效的token,请重新登录'
+                                message: '登录失效,请重新登录'
                             });
                             break;
                     }

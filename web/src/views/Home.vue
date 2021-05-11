@@ -1,5 +1,6 @@
 <template>
-    <div class="main" :class="this.$store.state.mobile ? 'bg-light' : ''">
+    <div class="main"  >
+        <div v-if="this.$store.state.mobile" class="bg-main" :class="this.$store.state.theme  ? 'bg-light' : 'bg-dark'"></div>
         <swiper-card ref="swiper"></swiper-card>
         <div class="container main-body">
             <div class="center">
@@ -8,7 +9,7 @@
                 </div>
                 <div id="home">
                     <div class="flex-middle-between">
-                        <span class="title">全部文章</span>
+                        <span class="title" :class="this.$store.state.theme  ? 'text-black' : 'text-white'" >全部文章</span>
                     </div>
                     <div class="card-box">
                         <article-card v-if="!this.$store.state.mobile" :articles="articles"></article-card>
@@ -18,7 +19,7 @@
                             @infinite="infiniteHandler"
                             ref="infiniteLoading"
                         >
-                            <span slot="no-more"> 我们是有底线的 </span>
+                            <span slot="no-more" :class="this.$store.state.theme  ? 'text-black' : 'text-white'"> 我们是有底线的 </span>
                         </infinite-loading>
                     </div>
                 </div>
@@ -98,6 +99,7 @@ export default {
                     });
                 });
             });
+            console.log(typeList);
             this.$store.commit('handleType', type);
             this.$store.commit('handleArticle', typeList);
         }

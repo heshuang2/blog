@@ -1,16 +1,17 @@
 <template>
-    <div id="dialog-card" :class="isDialog ? 'open' : 'close'" ref="dialog" >
-        <div class="v-card bg-white">
+    <div id="dialog-card" :class="isDialog ? 'open' : 'close'"
+        ref="dialog" >
+        <div class="v-card " :class="this.$store.state.theme ? 'bg-white' : 'bg-pitck'">
             <div class="back-btn">
-                <button class="bg-white" @click="closeDialog">
-                    <svg-icon icon-class="back" class="icon-item"></svg-icon>
+                <button :class="this.$store.state.theme ? 'bg-white' : 'bg-pitck'"  @click="closeDialog">
+                    <svg-icon :icon-class="this.$store.state.theme ? 'back' : 'back-dark'" class="icon-item"></svg-icon>
                 </button>
             </div>
-            <div class="login-content">
+            <div class="login-content" :class="this.$store.state.theme ? 'text-black' : 'text-white'" >
                 <div class="login-header">
                     <h2 class="header-top-fir">
                         欢迎{{ isLogin ? '回来' : '你' }}
-                        <button class="register-btn bg-primary" type="button" @click="toggleBtn">
+                        <button class="register-btn bg-primary text-black" type="button" @click="toggleBtn">
                             {{ isLogin ? '注册' : '登录' }}
                         </button>
                     </h2>
@@ -24,8 +25,8 @@
                     :rules="loginRules"
                     key="1"
                 >
-                    <el-form-item label="账号" prop="account">
-                        <el-input v-model="loginModel.account" class="input-group"></el-input>
+                    <el-form-item label="账号" prop="account"> 
+                        <el-input v-model="loginModel.account" class="input-group" ></el-input>
                     </el-form-item>
                     <el-form-item label="密码" prop="password">
                         <el-input

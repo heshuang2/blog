@@ -7,6 +7,9 @@ NProgress.configure({ showSpinner: false }); // NProgress Configuration
 router.beforeEach((to, from, next) => {
     if (!to.meta.isPublic && !localStorage.token) {
         return next('/login');
+    };
+    if (to.path === '/login' && localStorage.token) {
+        return next(from.path);
     }
     NProgress.start();
     next();

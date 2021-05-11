@@ -2,17 +2,35 @@
     <div id="users">
         <el-card shadow="hover">
             <div slot="header" class="clearfix">
-                <el-button type="primary" icon="el-icon-plus" @click="isDialog = true">新建</el-button>
+                <el-button type="primary" icon="el-icon-plus" disabled @click="isDialog = true">新建</el-button>
             </div>
             <el-table :data="users.slice((currentPage - 1) * pagesize, currentPage * pagesize)" border>
                 <el-table-column type="index" label="ID" width="50" align="center"></el-table-column>
                 <el-table-column label="用户名" prop="name" align="center"> </el-table-column>
                 <el-table-column label="权限" align="center" width="300">
                     <template slot-scope="scope">
-                        <el-tag >{{ scope.row.jurisdiction.name }}</el-tag>
+                        <el-tag>{{ scope.row.jurisdiction.name }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column flexd="right" label="操作" width="180" align="center">
+                <el-table-column label="状态" align="center" width="">
+                    <template slot-scope="scope">
+                        <el-tag :type="status[scope.row.online].online">{{status[scope.row.online].state}}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="锁定" width="300" align="center">
+                    <template slot-scope="scope">
+                        <el-tooltip :content="scope.row.locking ? '否' : '是'" placement="top">
+                            <el-switch
+                                v-model="scope.row.locking"
+                                active-color="#13ce66"
+                                inactive-color="#ff4949"
+                                @change="userStatus(scope.row._id, scope.$index)"
+                            >
+                            </el-switch>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+                <el-table-column flexd="right" label="操作" width="350" align="center">
                     <template slot-scope="scope">
                         <el-button
                             @click="edit(scope.row._id)"
@@ -32,7 +50,7 @@
                 </el-table-column>
             </el-table>
             <el-pagination
-                style="margin-top: .625rem"
+                style="margin-top: 0.625rem"
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
                 :total="users.length"
@@ -50,7 +68,7 @@
                     </div>
                     <el-form
                         label-width="3rem"
-                        style="width:100%"
+                        style="width: 100%"
                         label-position="left"
                         @submit.native.prevent="save(model._id)"
                     >
@@ -77,7 +95,7 @@
                                 :action="$http.defaults.baseURL + '/upload'"
                                 :headers="getAuthHeaders()"
                                 :show-file-list="false"
-                                :on-success="res => $set(model, 'avatar', res.url)"
+                                :on-success="(res) => $set(model, 'avatar', res.url)"
                             >
                                 <img v-if="model.avatar" :src="model.avatar" class="avatar" />
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -114,7 +132,8 @@ export default {
             categories: [],
             users: [],
             currentPage: 1,
-            pagesize: 5
+            pagesize: 5,
+            status: [{ online: 'success', state: '在线' }, { online: 'info', state: '离线' }]
         };
     },
     created() {
@@ -131,7 +150,7 @@ export default {
         // 获取分类列表
         async fetchCategories() {
             const { data: res } = await this.$http.get(`rest/categories`); // eslint-disable-line no-unused-vars
-            this.categories = res.find(key => key.name === '账号权限').children;
+            this.categories = res.find((key) => key.name === '账号权限').children;
         },
         // 删除
         async remove(row) {
@@ -181,20 +200,25 @@ export default {
         },
         isClose(done) {
             this.$confirm('确认关闭？')
-                .then(_ => {
+                .then((_) => {
                     done();
                 })
-                .catch(_ => {});
+                .catch((_) => {});
         },
         newDialog() {
             this.model = {};
             this.isEdit = false;
         },
-        handleSizeChange: function(val) {
+        handleSizeChange: function (val) {
             this.pagesize = val;
         },
-        handleCurrentChange: function(currentPage) {
+        handleCurrentChange: function (currentPage) {
             this.currentPage = currentPage;
+        },
+        userStatus(id, index) {
+            console.log(this.users[index]);
+            this.model = this.users[index];
+            this.save(id);
         }
     }
 };
@@ -212,3 +236,5 @@ export default {
     height: 100px;
 }
 </style>
+
+
