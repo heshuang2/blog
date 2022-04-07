@@ -1,6 +1,6 @@
 <template>
     <div id="browsing">
-        <el-card class="Bulletin-board">
+        <el-card class="Bulletin-board" >
             <div class="board-header font-a">
                 <span>全部分类</span>
             </div>
@@ -50,9 +50,10 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #browsing {
     position: relative;
+    border-radius: 1rem;
 }
 .tag-border {
     // float: left;

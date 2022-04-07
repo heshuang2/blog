@@ -8,13 +8,13 @@
                     <!-- 一年 -->
                     <div class="timeline-year" v-for="(item, index) in year">
                         <h2>
-                            <a class="yearToggle text-primary">{{ item }}年</a>
+                            <a class="yearToggle" :class="$store.state.theme ? 'text-black' : 'text-white'">{{ item }}年</a>
                             <i class="fa el-icon-bottom-right fa-fw text-primary"></i>
                         </h2>
                         <div class="timeline-month" v-for="(element, index) in trivialList[item]">
                             <ul>
                                 <li>
-                                    <div class="h4 animated fadeInLeft">
+                                    <div class="h4">
                                         <p class="date">{{ element.time }}</p>
                                     </div>
                                     <p class="animated dot-circle">
@@ -141,6 +141,7 @@ h6 {
             padding-bottom: 10px;
         }
         .content {
+            margin-top: 20px;
             max-width: 100%;
         }
     }
@@ -167,7 +168,6 @@ h6 {
         font-size: 30px;
         font-weight: 800;
         margin: 5px 0;
-        color: #000;
         text-decoration: none;
         border: none;
         text-align: right;
@@ -213,12 +213,9 @@ li {
 }
 .dot-circle {
     color: #484348;
-    width: 8%;
     text-align: center;
-    font-size: 22px;
     z-index: 1;
     position: relative;
-    background: #fff;
     float: left;
     width: 4%;
     font-size: 25px;

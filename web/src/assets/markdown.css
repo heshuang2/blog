@@ -14,7 +14,12 @@
     line-height: 1.8;
     word-wrap: break-word;
 }
-
+.markdown-body img {
+    text-align: center;
+    display: flex;
+    margin: 1rem auto;
+    border-radius: 2px;
+}
 .markdown-body .pl-c {
     color: #6a737d;
 }

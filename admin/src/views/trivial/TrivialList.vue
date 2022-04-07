@@ -1,97 +1,97 @@
 <template>
     <div id="trivialList">
         <el-card shadow="hover">
-        <div slot="header" class="clearfix">
-            <el-button type="primary" icon="el-icon-plus" @click="isDialog = true">新建</el-button>
-        </div>
-        <el-table
-            :data="trivials.slice((currentPage - 1) * pagesize, currentPage * pagesize)"
-            border
-            :default-sort = "{prop: 'datetime', order: 'ascending'}"
-        >
-            <el-table-column label="创建时间"  sortable align="center" width="200"  prop="datetime">
-                <template scope="scope">
-                    {{ scope.row.datetime | playTimeFormat }}
-                </template>
-            </el-table-column>
-            <el-table-column label="内容" header-align="center" :show-overflow-tooltip="true">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.content }}</span>
-                </template>
-            </el-table-column>
-            <el-table-column flexd="right" label="操作" width="180" align="center">
-                <template slot-scope="scope">
-                    <el-button
-                        @click="edit(scope.row._id)"
-                        type="primary"
-                        icon="el-icon-edit"
-                        circle
-                        size="small"
-                    ></el-button>
-                    <el-button
-                        @click="remove(scope.row)"
-                        type="danger"
-                        icon="el-icon-delete"
-                        circle
-                        size="small"
-                    ></el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-pagination
-            style="margin-top: .625rem"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :total="trivials.length"
-            :current-page="currentPage"
-            :page-sizes="[1, 5, 10]"
-            :page-size="pagesize"
-            layout="total, sizes, prev, pager, next, jumper"
-        >
-        </el-pagination>
-        <!-- 新建日常 -->
-        <el-dialog :visible.sync="isDialog" destroy-on-close :before-close="isClose" @closed="newDialog">
-            <el-card style="border-radius: 0; margin: 0">
-                <div slot="header" class="clearfix">
-                    <span class="dialog-title">{{ isEdit ? '编辑' : '新建' }}日常</span>
-                </div>
-                <el-form
-                    label-width="3rem"
-                    style="width:100%"
-                    label-position="left"
-                    @submit.native.prevent="save(model._id)"
-                >
-                    <el-form-item label="内容">
-                        <el-input
-                            type="textarea"
-                            style="max-width: 40rem"
-                            autosize
-                            :rows="2"
-                            placeholder="请输入内容"
-                            v-model="model.content"
-                        >
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item label="照片">
-                        <el-upload
-                            class="avatar-uploader"
-                            :action="$http.defaults.baseURL + '/upload'"
-                            :show-file-list="false"
-                            :headers="getAuthHeaders()"
-                            :on-success="res => $set(model, 'image', res.url)"
-                        >
-                            <img v-if="model.image" :src="model.image" class="avatar" />
-                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
-                    </el-form-item>
-                    <el-form-item style="float: right">
-                        <el-button @click="isDialog = false">取 消</el-button>
-                        <el-button type="primary" native-type="submit">保存</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-card>
-        </el-dialog>
-    </el-card>
+            <div slot="header" class="clearfix">
+                <el-button type="primary" icon="el-icon-plus" @click="isDialog = true">新建</el-button>
+            </div>
+            <el-table
+                :data="trivials.slice((currentPage - 1) * pagesize, currentPage * pagesize)"
+                border
+                :default-sort="{ prop: 'datetime', order: 'ascending' }"
+            >
+                <el-table-column label="创建时间" sortable align="center" width="200" prop="datetime">
+                    <template scope="scope">
+                        {{ scope.row.datetime | playTimeFormat }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="内容" header-align="center" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.content }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column flexd="right" label="操作" width="180" align="center">
+                    <template slot-scope="scope">
+                        <el-button
+                            @click="edit(scope.row._id)"
+                            type="primary"
+                            icon="el-icon-edit"
+                            circle
+                            size="small"
+                        ></el-button>
+                        <el-button
+                            @click="remove(scope.row)"
+                            type="danger"
+                            icon="el-icon-delete"
+                            circle
+                            size="small"
+                        ></el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                style="margin-top: 0.625rem"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :total="trivials.length"
+                :current-page="currentPage"
+                :page-sizes="[1, 5, 10]"
+                :page-size="pagesize"
+                layout="total, sizes, prev, pager, next, jumper"
+            >
+            </el-pagination>
+            <!-- 新建日常 -->
+            <el-dialog :visible.sync="isDialog" destroy-on-close :before-close="isClose" @closed="newDialog">
+                <el-card style="border-radius: 0; margin: 0">
+                    <div slot="header" class="clearfix">
+                        <span class="dialog-title">{{ isEdit ? '编辑' : '新建' }}日常</span>
+                    </div>
+                    <el-form
+                        label-width="3rem"
+                        style="width: 100%"
+                        label-position="left"
+                        @submit.native.prevent="save(model._id)"
+                    >
+                        <el-form-item label="内容">
+                            <el-input
+                                type="textarea"
+                                style="max-width: 40rem"
+                                autosize
+                                :rows="2"
+                                placeholder="请输入内容"
+                                v-model="model.content"
+                            >
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="照片">
+                            <el-upload
+                                class="avatar-uploader"
+                                :action="$http.defaults.baseURL + '/upload'"
+                                :show-file-list="false"
+                                :headers="getAuthHeaders()"
+                                :on-success="(res) => $set(model, 'image', res.url)"
+                            >
+                                <img v-if="model.image" :src="model.image" class="avatar" />
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
+                        </el-form-item>
+                        <el-form-item style="float: right">
+                            <el-button @click="isDialog = false">取 消</el-button>
+                            <el-button type="primary" native-type="submit">保存</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-card>
+            </el-dialog>
+        </el-card>
     </div>
 </template>
 
@@ -124,7 +124,7 @@ export default {
                 type: 'warning'
             })
                 .then(async () => {
-                    await this.$http.delete(`rest/trivials/${row._id}`);
+                    await this.$http.delete(`rest/trivials/${row._id}/${undefined}`);
                     this.$message({
                         type: 'success',
                         message: '删除成功!'
@@ -164,22 +164,21 @@ export default {
         },
         isClose(done) {
             this.$confirm('确认关闭？')
-                .then(_ => {
+                .then((_) => {
                     done();
                 })
-                .catch(_ => {});
+                .catch((_) => {});
         },
         newDialog() {
             this.model = {};
             this.isEdit = false;
         },
-        handleSizeChange: function(val) {
+        handleSizeChange: function (val) {
             this.pagesize = val;
         },
-        handleCurrentChange: function(currentPage) {
+        handleCurrentChange: function (currentPage) {
             this.currentPage = currentPage;
-        },
-      
+        }
     }
 };
 </script>

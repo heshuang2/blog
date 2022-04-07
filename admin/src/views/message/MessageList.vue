@@ -1,39 +1,105 @@
 <template>
     <div id="messageList">
         <el-card shadow="hover">
-            <div slot="header" class="clearfix">
+            <!--  <div slot="header" class="clearfix">
                 <el-button type="primary" icon="el-icon-plus" @click="isDialog = true">新建</el-button>
-            </div>
+            </div> -->
             <el-table
                 :data="messages.slice((currentPage - 1) * pagesize, currentPage * pagesize)"
-                border  row-key="_id"  :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
                 @sort-change="sortChange"
             >
-                <el-table-column label="创建时间" sortable='custom' align="center" width="200" 
-                prop="datetime" >
+                <el-table-column type="expand">
+                            <template slot-scope="props">
+                                <el-card>
+                                    <el-table :data="props.row.children">
+                                    <el-table-column
+                                        label="创建时间"
+                                        sortable
+                                        align="center"
+                                        width="200"
+                                        prop="datetime"
+                                    >
+                                        <template scope="scope">
+                                            {{ scope.row.datetime | playTimeFormat }}
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column
+                                        label="头像"
+                                        width="150"
+                                        align="center"
+                                        :show-overflow-tooltip="true"
+                                    >
+                                        <template slot-scope="scope">
+                                            <el-image :src="scope.row.user.avatar" fit="fit"></el-image>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="昵称" align="center" width="200px">
+                                        <template slot-scope="scope">
+                                            <el-tag
+                                                :effect="scope.row.children ? 'light' : 'dark'"
+                                                :type="scope.row.children ? 'success' : ''"
+                                                :size="scope.row.children ? '' : 'small'"
+                                                >{{ scope.row.user.name }}</el-tag
+                                            >
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="回复" width="100" align="center">
+                                        <template slot-scope="scope">
+                                            <el-tag type="info">{{ scope.row.userInfo.name }}</el-tag>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="内容" align="center" :show-overflow-tooltip="true">
+                                        <template slot-scope="scope">
+                                            <span>{{ scope.row.message }}</span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column flexd="right" label="操作" width="180" align="center">
+                                        <template slot-scope="scope">
+                                            <el-button
+                                                @click="remove(scope.row)"
+                                                type="danger"
+                                                icon="el-icon-delete"
+                                                circle
+                                                size="small"
+                                            ></el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                </el-card>
+                            </template>
+                        </el-table-column>
+                <el-table-column label="创建时间" sortable="custom" align="center" width="200" prop="datetime">
                     <template scope="scope">
                         {{ scope.row.datetime | playTimeFormat }}
                     </template>
                 </el-table-column>
                 <el-table-column label="昵称" align="center" width="200">
                     <template slot-scope="scope">
-                        <el-tag type="success">{{ scope.row.user.name }}</el-tag>
+                        <el-tag
+                            :effect="scope.row.children ? 'light' : 'dark'"
+                            :type="scope.row.children ? 'success' : ''"
+                            :size="scope.row.children ? '' : 'small'"
+                            >{{ scope.row.user.name }}</el-tag
+                        >
                     </template>
                 </el-table-column>
-                <el-table-column label="内容" header-align="center" :show-overflow-tooltip="true">
+                <el-table-column label="头像" align="center" width="200">
+                    <template slot-scope="scope">
+                        <el-image :src="scope.row.user.avatar"  fit="fit"></el-image>
+                    </template>
+                </el-table-column>
+                <el-table-column label="内容" align="center" :show-overflow-tooltip="true">
                     <template slot-scope="scope">
                         <span>{{ scope.row.message }}</span>
                     </template>
                 </el-table-column>
+                <el-table-column label="回复数" width="100" align="center">
+                            <template slot-scope="scope">
+                                <el-tag type="info" v-if="scope.row.children">{{ scope.row.children.length }}</el-tag>
+                            </template>
+                        </el-table-column>
                 <el-table-column flexd="right" label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <el-button
-                            @click="edit(scope.row._id)"
-                            type="primary"
-                            icon="el-icon-edit"
-                            circle
-                            size="small"
-                        ></el-button>
                         <el-button
                             @click="remove(scope.row)"
                             type="danger"
@@ -56,35 +122,6 @@
             >
             </el-pagination>
             <!-- 新建日常 -->
-            <el-dialog :visible.sync="isDialog" destroy-on-close :before-close="isClose" @closed="newDialog">
-                <el-card style="border-radius: 0; margin: 0">
-                    <div slot="header" class="clearfix">
-                        <span class="dialog-title">{{ isEdit ? '编辑' : '新建' }}日常</span>
-                    </div>
-                    <el-form label-width="3rem" label-position="left" @submit.native.prevent="save(model._id)">
-                        <el-form-item label="昵称">
-                            <el-input v-if="model.user != null" placeholder="请输入内容" v-model="model.user.name"> </el-input>
-                        </el-form-item>
-                        <el-form-item label="内容">
-                            <el-input
-                                type="textarea"
-                                autosize
-                                :rows="2"
-                                placeholder="请输入内容"
-                                v-model="model.message"
-                            >
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item label="回复">
-                            <el-tag v-if="model.children != null" type="info">{{model.children.length}}</el-tag>
-                        </el-form-item>
-                        <el-form-item style="float: right">
-                            <el-button @click="isDialog = false">取 消</el-button>
-                            <el-button type="primary" native-type="submit">保存</el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-card>
-            </el-dialog>
         </el-card>
     </div>
 </template>
@@ -109,8 +146,8 @@ export default {
         async fetch() {
             const { data: res } = await this.$http.get('rest/messages'); // eslint-disable-line no-unused-vars
             this.messages = res.data;
-            this.messages.sort((a, b) => a.datetime < b.datetime ? 1 : -1);
-            // console.log(this.messages);
+            this.messages.sort((a, b) => (a.datetime < b.datetime ? 1 : -1));
+            console.log(this.messages);
         },
         // 删除
         async remove(row) {
@@ -120,7 +157,7 @@ export default {
                 type: 'warning'
             })
                 .then(async () => {
-                    await this.$http.delete(`rest/messages/${row._id}`);
+                    await this.$http.delete(`rest/messages/${row._id}/${row.infoId}`);
                     this.$message({
                         type: 'success',
                         message: '删除成功!'
@@ -152,12 +189,14 @@ export default {
             this.fetch();
         },
         // 编辑
-        async edit(id) {
+        async edit(id, row) {
+            console.log(row);
             const { data: res } = await this.$http.get(`rest/messages/${id}`); // eslint-disable-line no-unused-vars
-            this.model = res.data;
+            /*  console.log(res);
+           this.model = res.data;
             this.isDialog = true;
             this.isEdit = true;
-            console.log(this.model);
+            console.log(this.model); */
         },
         isClose(done) {
             this.$confirm('确认关闭？')
@@ -179,9 +218,9 @@ export default {
         sortChange(column) {
             this.pageIndex = 1; // 排序后返回第一页
             if (column.order === 'descending') {
-                this.messages.sort((a, b) => b[column.prop] - a[column.prop] ? 1 : -1 );
+                this.messages.sort((a, b) => (b[column.prop] - a[column.prop] ? 1 : -1));
             } else if (column.order === 'ascending') {
-                this.messages.sort((a, b) => a[column.prop] - b[column.prop] ? 1 : -1);
+                this.messages.sort((a, b) => (a[column.prop] - b[column.prop] ? 1 : -1));
             }
         }
     }
@@ -198,4 +237,11 @@ export default {
     width: 100%;
     height: 100%;
 }
+.el-image >>> .el-image__inner {
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
 </style>

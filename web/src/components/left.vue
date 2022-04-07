@@ -4,16 +4,23 @@
             <span class="title"></span>
         </div>
         <div class="burl">
-            <el-card class="Bulletin-board" shadow="hover">
-                <div class="board-header">
-                    <span>公告栏</span>
-                </div>
-                <div class="board-main">
-                    <span class="">测试版本</span>
-                </div>
-            </el-card>
-            <new-message></new-message>
-            <div ref="browsing" :class="{ is_fixed: isFixed }">
+            <div
+                :class="this.$store.state.theme  ? 'bg-light card-border-white ' : 'bg-black text-white card-border-black'">
+                <el-card class="Bulletin-board" shadow="hover">
+                    <div class="board-header">
+                        <span>公告栏</span>
+                    </div>
+                    <div class="board-main">
+                        <span class="">测试版本</span>
+                    </div>
+                </el-card>
+            </div>
+            <div
+                :class="this.$store.state.theme  ? 'bg-light card-border-white ' : 'bg-black text-white card-border-black'">
+                <new-message></new-message>
+            </div>
+            <div ref="browsing"
+                 :class="[ {is_fixed: isFixed},this.$store.state.theme  ? 'bg-light card-border-white' : 'bg-black text-white card-border-black']">
                 <browsing></browsing>
             </div>
         </div>
@@ -43,7 +50,8 @@ export default {
     mounted() {
         window.addEventListener('scroll', this.scrollHander, true);
         this.$nextTick(() => {
-            this.offsetTop = this.utils.getTop(this.$refs.browsing)+ 175;
+            this.offsetTop = this.utils.getTop(this.$refs.browsing);
+            console.log(this.offsetTop);
         });
     },
     activated() {
@@ -66,9 +74,11 @@ export default {
 .el-menu {
     background-color: transparent;
 }
+
 .el-menu:hover {
     background-color: transparent;
 }
+
 .el-menu--horizontal > .el-menu-item {
     height: 56px;
     width: 125px;
@@ -77,11 +87,13 @@ export default {
     /* color: #fff !important; */
     border-bottom: none;
 }
+
 .el-menu--horizontal > .el-menu-item:not(.is-disabled):focus,
 .el-menu--horizontal > .el-menu-item:not(.is-disabled):hover,
 .el-menu--horizontal > .el-submenu .el-submenu__title:hover {
     background-color: transparent;
 }
+
 .el-menu-item.is-active {
     border-bottom: none !important;
     font-size: 120%;

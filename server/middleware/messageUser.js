@@ -4,7 +4,7 @@ module.exports =  async (data, User, res, count) => {
    // 解决：遍历前使用深拷贝处理
     // const asyncModel = require('async');
     data = JSON.parse(JSON.stringify(data));
-    console.log();
+    // console.log(data);
     if (data instanceof Array) {
         for (const element of data) {
             for (const key in element.user) {
@@ -30,6 +30,6 @@ module.exports =  async (data, User, res, count) => {
             item.userInfo = userInfo;
         }
     }
-    
+
     res.send({data, count});
 };

@@ -1,9 +1,8 @@
+
 .mobile {
     min-height: 100vh;
 
-    html {
-        touch-action: manipulation;
-    }
+
 
     html,
     body,
@@ -32,9 +31,12 @@
         bottom: 3.125rem;
         right: .5rem;
     }
-
+    .container {
+        padding-bottom: 0;
+    }
     .main {
         padding: 5rem 1.5rem;
+        padding-bottom: 2rem;
         position: relative;
         box-sizing: border-box;
 
@@ -48,10 +50,10 @@
         }
 
         #swiper-card {
-            min-height: 85vh;
+            min-height: 41rem;
 
             .swiper-container {
-                height: 85vh;
+                height: 41rem;
                 display: flex;
 
                 .item-title {
@@ -92,8 +94,7 @@
 
     #post {
         .post-main {
-            padding: 0;
-            padding: 3rem 0;
+            padding-top: 3rem;
 
             .page-title {
                 .title {
@@ -132,10 +133,13 @@
         min-height: 100vh;
 
         .message-main {
-            padding: 3rem 0;
-
+            padding-top: 3.25rem ;
+            min-height: 100vh;
+            .page {
+                margin-bottom: 3rem;
+            }
             .message-title-h {
-                padding: 1rem;
+                padding-bottom: 1rem;
                 font-weight: 550;
 
             }
@@ -211,10 +215,10 @@
         bottom: 0;
         z-index: 1001;
         transition: height 0.3s linear;
-        -webkit-transition: height 0.3s linear;
+        /*-webkit-transition: height 0.3s linear;
         -moz-transition: height 0.3s linear;
         -ms-transition: height 0.3s linear;
-        -o-transition: height 0.3s linear;
+        -o-transition: height 0.3s linear;*/
         display: flex !important;
 
 
@@ -243,15 +247,19 @@
     }
 
     #user {
-        min-height: 100vh;
 
         .container {
             padding-top: 3rem;
+            .page {
+                min-height: calc(100vh - 8rem);
+            }
         }
 
         .user-card {
             padding: 0;
-
+            .page {
+                min-height: 0;
+            }
             .user-background {
                 height: 25vh !important;
                 margin-bottom: 4.6875rem;
@@ -372,14 +380,25 @@
             }
         }
     }
-
+    #links {
+        .link-main {
+            padding-top: 3.25rem;
+        }
+    }
     #backtop {
+        background: initial;
+        box-shadow: none;
         .backtop-border {
             animation: none;
             -webkit-animation: none;
             opacity: 0;
         }
 
+    }
+    #top {
+        .aplayer {
+
+        }
     }
 }
 

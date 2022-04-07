@@ -7,10 +7,10 @@
             :key="index"
         >
             <div class="article-img" :style="{ backgroundImage: 'url(' + item.icon + ')' }"></div>
-            <v-touch
+            <div
                 class="article-body"
                 :class="$store.state.theme ? 'text-black' : 'text-white'"
-                @tap="ariticleDetails(item._id)"
+                @click="ariticleDetails(item._id)"
             >
                 <div class="article-title">
                     <span href="">{{ item.title }}</span>
@@ -21,7 +21,7 @@
                 <div class="article-brief">
                     <span>{{ item.brief | beautySub(42) }}</span>
                 </div>
-            </v-touch>
+            </div>
             <div class="article-bar" :class="$store.state.theme ? 'text-black' : 'text-white'">
                 <span><svg-icon :iconClass="$store.state.theme ? 'eye' : 'eye-dark'" class="bar-icon"></svg-icon>{{ item.views }}</span>
                 <!-- <span><svg-icon iconClass="like" class="bar-icon"></svg-icon>1</span> -->
@@ -67,7 +67,7 @@ export default {
             width: 100%;
             border-top-left-radius: inherit;
             border-top-right-radius: inherit;
-            filter: blur(0.02rem) brightness(1.2);
+            filter:  brightness(1);
         }
         .article-title {
             padding: 3vh 3vh 0 3vh;

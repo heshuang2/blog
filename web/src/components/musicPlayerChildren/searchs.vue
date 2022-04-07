@@ -89,6 +89,7 @@ export default {
         },
         // 向父组件传参
         getMusic(id) {
+            console.log(id);
             this.$bus.$emit('musicId', id);
         },
         // 搜索音乐

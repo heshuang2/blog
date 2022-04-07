@@ -2,15 +2,17 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import Diarys from '../views/Diarys.vue';
-import Photos from '../views/photos.vue';
+import Links from '../views/links.vue';
 import Messages from '../views/Messages.vue';
 import User from '../views/User.vue';
 import Post from '../views/Post.vue';
 import Type from '../views/childComps/Type.vue';
+import Reset from '../views/reset.vue';
 
 //导入进度条插件
 import Nprogress from 'nprogress';
 import 'nprogress/nprogress';
+
 
 Vue.use(VueRouter);
 
@@ -45,16 +47,16 @@ const routes = [
         }
     },
     {
-        path: '/photos',
-        component: Photos,
-        name: 'photos'
+        path: '/links',
+        component: Links,
+        name: 'Links'
     },
     {
         path: '/messages',
         component: Messages,
         name: 'messages',
         meta: {
-            keepAlive: false // 需要缓存
+            keepAlive: true // 需要缓存
         }
     },
     {
@@ -72,30 +74,41 @@ const routes = [
         meta: {
             keepAlive: true // 需要缓存
         }
-    }
+    },
+    {
+        path: '/reset',
+        component: Reset,
+        name: 'Reset',
+        meta: {
+            keepAlive: false // 需要缓存
+        }
+    },
 ];
 
 const router = new VueRouter({
     routes,
     mode: 'history',
-    scrollBehavior(to, from, savedPosition) {
+   /* scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {
             return savedPosition;
         } else {
             if (from.meta.keepAlive) {
+                console.log( document.documentElement.scrollTop);
                 from.meta.savedPosition = document.documentElement.scrollTop;
             }
         }
-        return {
-            x: 0,
-            y: 0
-        };
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({ x: 0, y: to.meta.savedPosition ||0});
+            }, 0);
+        });
     },
     beforeRouteLeave() {
         console.log(1);
-    }
+    }*/
     //在页面离开时记录滚动位置
 });
+
 router.beforeEach((to, from, next) => {
     Nprogress.start();
     next();

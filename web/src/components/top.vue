@@ -1,7 +1,9 @@
 <template>
-    <div id="top" :class="this.$store.state.mobile ? 'bg-light' : ''">
-        <div v-if="!this.$store.state.mobile" class="mini-header">
-            <div class="mini-header-conten">
+    <div id="top" >
+        <!--pc-->
+        <div v-if="!this.$store.state.mobile" class="mini-header " :class="this.$store.state.theme ? 'bg-white' : 'bg-dark'"
+        >
+            <div class="mini-header-conten ">
                 <div class="nav-link">
                     <ul>
                         <li
@@ -11,7 +13,7 @@
                             @click="current = index"
                         >
                             <router-link :to="item.path">
-                                <span>{{ item.name }}</span>
+                                <span :class="$store.state.theme ? 'text-black' : 'text-white'">{{ item.name }}</span>
                                 <!-- <span :class="{ isactive: index === current }"></span> -->
                             </router-link>
                         </li>
@@ -25,20 +27,26 @@
                             </div>
                             <li v-for="(item, index) in navIcon" :key="index" slot="reference">
                                 <svg-icon
-                                    :icon-class="item.icon"
+                                    :icon-class="$store.state.theme ? item.icon1 : item.icon2"
                                     class="icon-item"
                                     @mouseover="selectStyle(item)"
                                     @mouseleave="outStyle"
                                 />
                             </li>
                         </el-popover>
+                        <li>
+                            <el-tooltip content="切换主题" placement="bottom">
+                                <svg-icon :icon-class="$store.state.theme ? 'night-black' : 'daytime'"
+                                          class="icon-item" @click="changeTheme(!$store.state.theme)"></svg-icon>
+                            </el-tooltip>
+                        </li>
                     </ul>
                     <div class="login" v-if="!this.$store.state.isLogin">
                         <dialog-btn></dialog-btn>
                     </div>
                     <el-dropdown v-else placement="bottom" trigger="click" @command="handleCommand">
                         <div class="login-avatar">
-                            <img :src="this.$store.state.currentUser.avatar" alt="" />
+                            <img :src="this.$store.state.currentUser.avatar" alt=""/>
                         </div>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item command="1">我的账号</el-dropdown-item>
@@ -49,40 +57,43 @@
                 </div>
             </div>
         </div>
-        <div v-else class="mobile-header__content " :class="this.$store.state.theme  ? 'bg-light' : 'bg-dark'">
-            <div class="mobile-header" :class="this.$store.state.theme  ? 'text-black' : 'text-white'">
-                <div class="mobile-header-left flex-middle" >
-                    <v-touch tag="span" v-show="!isBack" class="v-badge" @tap="isTypeShow = true">
+        <!--h5-->
+        <div v-else class="mobile-header__content animate__animated animate__fadeInDown" :class="this.$store.state.theme  ? 'bg-light text-black' : 'bg-dark text-white'" >
+            <div class="mobile-header " >
+                <div class="mobile-header-left flex-middle">
+                    <div  v-show="!isBack" class="v-badge" @click="isTypeShow = true">
                         <svg-icon iconClass="type" class="menu-icon"></svg-icon>
-                    </v-touch>
-                    <v-touch tag="span" v-show="isBack" class="v-badge" @tap="$router.go(-1)">
-                        <svg-icon :iconClass="this.$store.state.theme ? 'back1' : 'back1-dark'" class="menu-icon"></svg-icon>
-                    </v-touch>
-                    <v-touch tag="span" v-show="!isPost" class="s-badge" >    
-                        <span>{{this.$store.state.articleTitle | beautySub(12)}}</span>
-                    </v-touch>
+                    </div>
+                    <div  v-show="isBack" class="v-badge" @click="$router.back()">
+                        <svg-icon :iconClass="this.$store.state.theme ? 'back1' : 'back1-dark'"
+                                  class="menu-icon"></svg-icon>
+                    </div>
+                    <div  v-show="!isPost" class="s-badge">
+                        <span>{{ this.$store.state.articleTitle | beautySub(11) }}</span>
+                    </div>
                 </div>
                 <div class="mobile-header-center flex-middle">
-                    <router-link v-show=" !isHome" :to="'/home'">
-                        <img class="logo" src="../assets/img/logo.png" alt="" />
-                    </router-link>
+
                 </div>
-                <div class="mobile-header-right flex-middle" @click="onSelect">
-                    
-                    <span class="v-badge">
+                <div class="mobile-header-right flex-middle" >
+                    <music-player_h5 :musicShow.sync="musicShow"></music-player_h5>
+                    <span class="v-badge" @click="onSelect">
                         <svg-icon :iconClass="$store.state.theme ? 'menu' : 'menu_dark'" class="menu-icon"></svg-icon>
                     </span>
                 </div>
             </div>
             <type-card v-if="!isBack" :class="isTypeShow ? 'type-content-show' : 'type-content-close'"></type-card>
-            <aside-card
-                v-show="isLoad == 1"
-                :class="isAsideShow ? 'aside-content-show' : 'aside-content-close'"
-                :linknames="linknames"
-            ></aside-card>
-            <van-overlay :show="isAsideShow" @click="onSelect"> </van-overlay>
         </div>
-        <audio-player v-if="!this.$store.state.mobile" ref="aplayer" :isMini="mini"></audio-player>
+        <aside-card
+            v-show="isLoad === 1" ref="asideCard"
+            :class="isAsideShow ? 'aside-content-show' : 'aside-content-close'"
+            :linknames="linknames"
+        ></aside-card>
+        <van-action-sheet v-model="musicShow" class="music-card" :round="false">
+            <music  :music-show.sync="musicShow"></music>
+        </van-action-sheet>
+        <van-overlay :show="isAsideShow" @click="onSelect"></van-overlay>
+        <audio-player v-if="!$store.state.mobile"  ref="aplayer" :isMini="mini" class="aplayer"></audio-player>
     </div>
 </template>
 
@@ -94,9 +105,21 @@ import TypeCard from './h5_components/typeCard_h5/typeCard_h5.vue';
 import AudioPlayer from './musicPlayerChildren/AudioPlayer.vue';
 import searchs from './musicPlayerChildren/searchs.vue';
 import SvgIcon from './SvgIcon/SvgIcon.vue';
+import MusicPlayer_h5 from './h5_components/musicPlayer_h5/musicPlayer_h5';
+import Music from '../views/Music';
 
 export default {
-    components: { searchs },
+    components: {
+        Music,
+        MusicPlayer_h5,
+        searchs,
+        AudioPlayer,
+        DialogCard,
+        DialogBtn,
+        SvgIcon,
+        TypeCard,
+        AsideCard
+    },
     name: 'top',
     data() {
         return {
@@ -104,16 +127,18 @@ export default {
                 { id: 1, name: '主站', path: '/home', icon: 'home' },
                 { id: 2, name: '琐碎', path: '/Diarys', icon: 'diarys' },
                 { id: 3, name: '留言', path: '/Messages', icon: 'messages' },
-                { id: 4, name: '友链', path: '/photos', icon: 'links' }
+                { id: 4, name: '友链', path: '/links', icon: 'links' },
             ],
             navIcon: [
                 {
                     msg: '搜索',
-                    icon: 'icon-search'
+                    icon1: 'icon-search',
+                    icon2: 'icon-search-black'
                 },
                 {
                     msg: '音乐',
-                    icon: 'yinle'
+                    icon1: 'icon-music',
+                    icon2: 'icon-music-black'
                 }
             ],
             current: 0,
@@ -125,32 +150,29 @@ export default {
             isLoad: 0,
             isBack: false,
             isPost: false,
-            isHome: false
+            isHome: false,
+            musicShow: false, // 音乐播放界面
         };
     },
-    components: {
-        searchs,
-        AudioPlayer,
-        DialogCard,
-        DialogBtn,
-        SvgIcon,
-        TypeCard,
-        AsideCard
-    },
+
     watch: {
         isAsideShow() {
             document.body.style.overflow = this.isAsideShow ? 'hidden' : 'inherit';
         },
         $route(to, from) {
-            this.isBack =['home', 'type'].includes(to.name) ? false : true;
-            this.isPost = to.name == 'post' ? false : true;
-            this.isHome = to.name == 'home' ? false : true;
+            this.isBack = !['home', 'type'].includes(to.name);
+            this.isPost = to.name !== 'post';
+            this.isHome = to.name !== 'home';
+              if (to.name === 'Reset') {
+                this.isAsideShow = false;
+            }
         }
     },
     mounted() {
-        this.isBack = ['home', 'type'].includes(this.$route.name) ? false : true;
-        this.isPost = this.$route.name == 'post' ? false : true;
-        this.isHome = this.$route.name == 'home' ? false : true;
+        this.isBack = !['home', 'type'].includes(this.$route.name);
+        this.isPost = this.$route.name !== 'post';
+        this.isHome = this.$route.name !== 'home';
+        console.log(this.$refs.music);
     },
     methods: {
         selectStyle(item) {
@@ -160,6 +182,10 @@ export default {
         },
         outStyle() {
             this.$refs.aplayer.ismini = true;
+        },
+        // 切换主题
+        changeTheme(_state) {
+            this.$store.commit('handleTheme', _state);
         },
         // 登出
         handleCommand(command) {
@@ -182,37 +208,19 @@ export default {
             this.isAsideShow = !this.isAsideShow;
             this.isLoad = 1;
         }
-        /* debounce(func, wait, immediate) {
-            let timer;
-            return function () {
-                let context = this,
-                    args = arguments;
-
-                if (timer) clearTimeout(timer);
-                if (immediate) {
-                    let callNow = !timer;
-                    timer = setTimeout(() => {
-                        timer = null;
-                    }, wait);
-                    if (callNow) func.apply(context, args);
-                } else {
-                    timer = setTimeout(() => {
-                        func.apply;
-                    }, wait);
-                }
-            };
-        } */
     }
 };
 </script>
 
 <style lang="scss">
 .mini-header {
-    min-height: 100%;
+    height: 3.25rem;
     width: 100%;
     z-index: 1;
     position: absolute;
+    border-bottom: 1px solid #ccc;
 }
+
 .mini-header-conten {
     min-height: 100%;
     // box-sizing: border-box;
@@ -225,10 +233,12 @@ export default {
     align-items: flex-start;
     justify-content: space-between;
 }
+
 .nav-link {
     height: 100%;
     display: flex;
 }
+
 .nav-link-li {
     display: block;
     float: left;
@@ -237,6 +247,7 @@ export default {
     color: #565;
     cursor: pointer;
 }
+
 .isactive {
     background-color: rgb(223, 196, 46);
     display: block;
@@ -249,29 +260,37 @@ export default {
     transition: all 0.6s;
     z-index: -1;
 }
+
 .nav-link-li a {
     text-decoration: none;
     list-style: none;
     display: block;
     line-height: 32px;
     padding: 4px 28px;
-    color: #212220;
     font-weight: 1000;
     font-size: 18px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
     -webkit-transition: all 0.2s;
     transition: all 0.2s;
 }
+
 .nav-link-li .router-link-exact-active {
     text-decoration: none;
     color: rgb(223, 196, 46);
 }
+
 .nav-link-li .router-link-active {
     border-bottom: 4px solid rgb(223, 196, 46);
+
+    span {
+        color: rgb(223, 196, 46);
+    }
 }
+
 .nav-link-li :hover {
     color: rgb(223, 196, 46);
 }
+
 .nav-icon {
     // width: 15%;
     height: 100%;
@@ -281,10 +300,12 @@ export default {
         float: left;
         padding: 0 10px;
     }
+
     .login-avatar {
         float: left;
         padding: 0 10px;
         height: 36px;
+
         img {
             height: 36px;
             width: 36px;
@@ -293,6 +314,7 @@ export default {
             cursor: pointer;
         }
     }
+
     ul {
         float: left;
         // display: inline-block;
@@ -303,24 +325,29 @@ export default {
             padding: 4px 15px;
             float: left;
             cursor: pointer;
+
             .icon-item {
                 font-size: 150%;
             }
         }
     }
+
     .nav-search {
         width: 100%;
         position: relative;
         float: right;
         z-index: 9;
+
         .search-none {
             display: none;
         }
+
         .search-active {
             display: block;
         }
     }
 }
+
 // 移动端
 .mobile-header__content {
     width: 100%;
@@ -328,6 +355,7 @@ export default {
     display: flex;
     position: relative;
     padding: 1vh 2vh;
+
     .mobile-header {
         position: relative;
         margin: 0 auto;
@@ -335,45 +363,50 @@ export default {
         height: 100%;
         text-align: center;
         z-index: 1;
+
         .flex-middle {
             display: flex;
             justify-content: center;
             align-items: center;
         }
+
         .mobile-header-left,
         .mobile-header-right {
             position: absolute;
             top: 0;
             height: 100%;
         }
+
         .mobile-header-left {
             left: 0;
         }
+
         .mobile-header-center {
             height: 100%;
+
             a {
                 display: flex;
                 align-items: center;
-                .logo {
-                    width: 5vh;
-                    height: 5vh;
-                    object-fit: cover;
-                }
             }
         }
+
         .mobile-header-right {
             right: 0;
         }
+
         .v-badge {
             width: 3rem;
+
             .menu-icon {
                 font-size: 1.5rem;
             }
         }
+
         .s-badge {
             // padding: 0 1rem;
         }
     }
+
     .type-content-show {
         height: 100vh;
         // background: #202020;
@@ -382,25 +415,37 @@ export default {
         transition: all 0.5s;
         // transform-origin: 50% 0;
     }
+
     .type-content-close {
         height: 3.25rem;
         transition: all 0.5s;
         z-index: 0;
         opacity: 0;
     }
-    .aside-content-show {
-        left: 0;
-        opacity: 1;
-        animation: slide-left 0.5s;
-    }
-    .aside-content-close {
-        animation: slide-right 0.3s;
-        left: -68%;
-    }
+
+
+
+
+
     :root {
         --animate-duration: 1s;
         --animate-delay: 1s;
         --animate-repeat: 1;
     }
+
+
+}
+.aside-content-show {
+    left: 0;
+    opacity: 1;
+    animation: slide-left 0.5s;
+}
+.aside-content-close {
+    animation: slide-right 0.3s;
+    left: -68%;
+}
+.music-card {
+    max-height: 100% !important;
+    height: 100%;
 }
 </style>

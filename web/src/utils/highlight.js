@@ -19,9 +19,14 @@ const doc = svgicon.$el;
 let clipboard = null;
 
 const highlight = Vue.directive('highlight', {
-    update: function(el) {
+    deep: true,
+    inserted (el,binding) {
+        store.state.key = 0;
+    },
+    componentUpdated (el, binding) {
+        // after an update, re-fill the content and then highlight
         let blocks = el.querySelectorAll('pre code');
-        if (store.state.key == 0) {
+        if (store.state.key === 0) {
             blocks.forEach(block => {
                 hljs.highlightBlock(block);
                 // 添加ul增加行号
@@ -61,7 +66,7 @@ const highlight = Vue.directive('highlight', {
                 });
             });
         }
-    }
+    },
 });
 
 export default highlight;

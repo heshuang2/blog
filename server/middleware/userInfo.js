@@ -2,7 +2,7 @@
 module.exports = (options) => {
     return async (req, res, next) => {
         const data = req.body;
-        if (data.infoId != '') {
+        if (data.infoId && data.infoId !== '') {
             const model = await req.Model.updateOne(
                 {
                     _id: data.infoId

@@ -134,7 +134,7 @@ export default {
                 type: 'warning'
             })
                 .then(async () => {
-                    await this.$http.delete(`rest/adminUsers/${row._id}`);
+                    await this.$http.delete(`rest/adminUsers/${row._id}/${undefined}`);
                     this.$message({
                         type: 'success',
                         message: '删除成功!'

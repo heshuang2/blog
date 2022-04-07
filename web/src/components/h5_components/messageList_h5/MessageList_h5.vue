@@ -8,7 +8,7 @@
                 :key="index"
             >
                 <div class="list-avatar-h">
-                    <img :src="item.user.avatar" alt="" />
+                    <img :src="item.user.avatar" alt=""/>
                 </div>
                 <div class="list-warp-h">
                     <div class="list-name-h">
@@ -26,7 +26,7 @@
                         <svg-icon iconClass="more" class="more-icon"></svg-icon>
                     </div>
                     <van-button
-                        v-show="item.children.length != 0"
+                        v-show="item.children.length !== 0"
                         class="reply-btn-h ripple"
                         :class="[
                             !item.isDrop ? 'btn-none' : 'btn-show',
@@ -41,14 +41,14 @@
                         <div class="reply--warp-border bg-grey"></div>
                         <div class="list-content-h reply-content-h" v-for="(itemChild, i) in item.children" :key="i">
                             <div class="list-avatar-h reply-avatar-h">
-                                <img :src="itemChild.user.avatar" alt="" />
+                                <img :src="itemChild.user.avatar" alt=""/>
                             </div>
                             <div class="list-warp-h reply-warp-h">
                                 <div class="list-name-h reply-name-h">
                                     <span>{{ itemChild.user.name }}</span>
                                     <span v-if="itemChild.isReply" class="reply-userinfo-h">
                                         <span class="reply-h" :class="$store.state.theme ? 'text-black' : 'text-white'"
-                                            >回复</span
+                                        >回复</span
                                         >
                                         <span>{{ itemChild.userInfo.name }}</span>
                                     </span>
@@ -68,7 +68,7 @@
                         </div>
                     </div>
                     <van-button
-                        v-show="item.children.length != 0 && !item.isDrop"
+                        v-show="item.children.length !== 0 && !item.isDrop"
                         class="reply-btn-h ripple"
                         :class="$store.state.theme ? 'bg-white' : 'bg-content text-white'"
                         @click="slideLeave(index, item)"
@@ -116,7 +116,8 @@
                     class="closeBtn"
                     :class="$store.state.theme ? 'bg-white text-black' : 'bg-black text-white'"
                     @click="show = false"
-                    >取消</van-button
+                >取消
+                </van-button
                 >
             </div>
         </van-popup>
@@ -125,6 +126,7 @@
 
 <script>
 import SvgIcon from '../../SvgIcon/SvgIcon.vue';
+
 export default {
     components: { SvgIcon },
     props: {
@@ -163,35 +165,36 @@ export default {
     },
     methods: {
         slideEnter(index, item) {
-            this.$store.commit('HandleSlideList', index);
-            // console.log( this.$store.state.slideList);
+            item.isDrop = false;
+            this.$store.commit('HandleSlideList', item);
+            // console.log('存入', this.$store.state.slideList)
             const el = this.$refs.reply[index];
             // console.log(el);
-            if (item) {
-                item.isDrop = false;
+            if (el) {
+                el.style.height = 'auto';
+                let height = window.getComputedStyle(el, null)['height'];
+                el.style.height = '0';
+                //不设定延迟height不会有动画
+                setTimeout(function() {
+                    el.style.height = height;
+                    el.style.opacity = 1;
+                }, 20);
             }
-            el.style.height = 'auto';
-            let height = window.getComputedStyle(el, null)['height'];
-            el.style.height = '0';
-            //不设定延迟height不会有动画
-            setTimeout(function () {
-                el.style.height = height;
-                el.style.opacity = 1;
-            }, 20);
         },
         slideLeave(index, item) {
-            this.$store.commit('RemoveSlideList', index);
             const el = this.$refs.reply[index];
             el.style.height = '0';
-            if (item) {
-                setTimeout(function () {
-                    item.isDrop = true;
-                }, 300);
-            }
+            setTimeout(function() {
+                item.isDrop = true;
+                this.$store.commit('RemoveSlideList', item);
+                // console.log('移除', this.$store.state.slideList);
+            }.bind(this), 300);
         },
         clearLeave(index) {
-            const el = this.$refs.reply[index];
-            el.style.height = '0';
+            const el = this.$refs.reply[index]
+            if (el) {
+                el.style.height = '0';
+            }
         },
         replyBtn(index, data, item, key) {
             this.$bus.$emit('bottomMessage', true, data, item, key, index);
@@ -220,15 +223,17 @@ export default {
                 beforeClose: async (action, done) => {
                     if (action === 'confirm') {
                         if (this.article) {
-                            const { data: res } = await this.$http2.delete(
+                            await this.$http2.delete(
                                 `rest/comments/${this.listData._id}/${this.listData.infoId}`
                             );
-                            this.$bus.$emit('getArticleComment', 1, this.messageLists.length, 2, this.index, this.item);
+                            this.$bus.$emit('getArticleComment', 1, this.messageLists.length);
                         } else {
-                            const { data: res } = await this.$http2.delete(
+                            this.$http2.delete(
                                 `rest/messages/${this.listData._id}/${this.listData.infoId}`
-                            );
-                            this.$bus.$emit('getMessageList', 1, this.messageLists.length, 2, this.index, this.item);
+                            ).then((res) => {
+                                this.$bus.$emit('getMessageList', 1, this.messageLists.length);
+                            })
+
                         }
                         done();
                         /* if (!this.listData.children) {
@@ -249,9 +254,8 @@ export default {
                     `${this.article ? 'getArticleComment' : 'getMessageList'}`,
                     (this.messageLists.length / 5 + 1).toFixed(),
                     5,
-                    1
                 );
-                this.$bus.$on('isLoad', function () {
+                this.$bus.$on('isLoad', function() {
                     this.isLoad = true;
                     console.log(1);
                 });
@@ -269,6 +273,7 @@ export default {
     // border-bottom: 1px solid #ccc;
     .list-body-h {
         width: 100%;
+
         .list-content-h {
             width: 100%;
             box-sizing: border-box;
@@ -278,11 +283,13 @@ export default {
             margin-bottom: 0.1rem;
             // border-bottom: 1px solid #ccc;
             position: relative;
+
             .list-avatar-h {
                 // flex: 0 0 10%;
                 // display: flex;
                 float: left;
                 padding-right: 0.625rem;
+
                 img {
                     height: 36px;
                     width: 36px;
@@ -290,20 +297,24 @@ export default {
                     border-radius: 50%;
                 }
             }
+
             .list-warp-h {
                 // flex: 1 0 80%;
                 padding-left: 15%;
                 position: relative;
+
                 .list-name-h {
                     font-size: 15px;
                     line-height: 18px;
                     color: #03a0a0;
                 }
+
                 .list-date-h {
                     font-size: 12px;
                     line-height: 20px;
                     color: #999;
                 }
+
                 .list-msg-h {
                     padding: 0.5rem 0;
                     // display: flex;
@@ -312,34 +323,41 @@ export default {
                     width: 100%;
                     overflow: hidden;
                 }
+
                 .list-more-h {
                     position: absolute;
                     right: 0;
                     top: 0.5rem;
+
                     .more-icon {
                         font-size: 1.5rem;
                     }
                 }
+
                 .reply-btn-h {
                     height: auto;
                     width: auto;
                     padding: 0.2rem 0.5rem;
                     border-radius: 1rem;
                 }
+
                 .van-button::before {
                     // background-color: #fff;
                 }
+
                 .btn-none {
                     // display: none;
                     position: absolute;
                     opacity: 0;
                     // transition: all .2s linear;
                 }
+
                 .btn-show {
                     // display: block;
                     opacity: 1;
                     transition: all 0.5s linear;
                 }
+
                 .list-reply-h {
                     width: 100%;
                     height: 0;
@@ -354,23 +372,29 @@ export default {
                         height: 100%;
                         border-radius: 2rem;
                     }
+
                     .reply-content-h {
                         padding: 0.2rem 0;
                         border: none;
+
                         .reply-avatar-h {
                             position: relative;
                             padding: 0.2rem 0.5rem;
+
                             img {
                                 width: 30px;
                                 height: 30px;
                             }
                         }
+
                         .reply-name-h {
                             font-size: 0.75rem !important;
+
                             .reply-h {
                                 padding: 0 0.25rem;
                             }
                         }
+
                         .reply-msg-h {
                             position: relative;
                             overflow: hidden;
@@ -379,6 +403,7 @@ export default {
                 }
             }
         }
+
         .list-loader {
             // margin-top: 50px;
 
@@ -391,6 +416,7 @@ export default {
             border-radius: 6px;
             cursor: pointer;
         }
+
         .list-null {
             text-align: center;
             border-top: 1px solid #ccc;
@@ -400,25 +426,31 @@ export default {
             font-size: 15px;
         }
     }
+
     .handle {
         width: 100%;
         display: flex;
         justify-content: center;
+
         .cut-icon {
             font-size: 25px;
         }
     }
+
     .popup-reply {
         font-weight: 500;
         padding: 1rem 1rem;
         font-size: 13px;
         color: #999;
     }
+
     .popup-content {
         font-size: 16px !important;
+
         ul {
             width: 100%;
             padding: 0.5rem 0;
+
             li {
                 // transform: scaleY(0.1);
                 width: 100%;
@@ -426,6 +458,7 @@ export default {
                 // border-top: 1px solid #ccc;
                 text-align: center;
             }
+
             li::after {
                 content: '';
                 display: block;
@@ -436,6 +469,7 @@ export default {
                 background: #ccc;
             }
         }
+
         .closeBtn {
             width: 96%;
             box-sizing: border-box;

@@ -1,4 +1,6 @@
 // 更改用户状态信息
+import { playStatus } from './getters';
+
 export const userStatus = (state, user) => {
     if (user) {
         state.currentUser = user;
@@ -42,11 +44,33 @@ export const HandleSlideList = (state, value) => {
     }
 };
 export const RemoveSlideList = (state, value) => {
-    const flag = state.slideList.indexOf(value);
-    if (flag != -1) {
-        state.slideList.splice(flag, 1);
+    if(value) {
+        const flag = state.slideList.indexOf(value);
+        if (flag !== -1) {
+            state.slideList.splice(flag, 1);
+        }
+    } else {
+        state.slideList = [];
     }
+
 };
 export const handleTheme = (state, value) => {
     state.theme = value;
 };
+//
+export const handleResetUserId = (state, value) => {
+    state.resetUserId = value;
+};
+export const handleCurrentMusic = (state, value) => {
+    state.currentMusic = value;
+};
+export const handlePlayStatus = (state, value) => {
+    state.playStatus = value;
+};
+export const PushCurrentMusic = (state,[key, value]) => {
+    state.currentMusic[key] = value;
+};
+export const handleAudioReady = (state, value) => {
+    state.isAudioReady = value;
+};
+

@@ -6,13 +6,13 @@ function resolve(dir) {
 module.exports = {
     devServer: {
         proxy: {
-            '/api1': {
+            /*'/api1': {
                 target: 'https://autumnfish.cn/', //设置调用的接口域名和端口号
-                changeOrigin: true, //true表示实现跨域
+                changeOrigin: false, //true表示实现跨域
                 pathRewrite: {
                     '^/api1': '/' //这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替baseurl
                 }
-            },
+            },*/
             '/api2': {
                 target: 'http://localhost:3000/web/api', //设置调用的接口域名和端口号
                 changeOrigin: true, //true表示实现跨域

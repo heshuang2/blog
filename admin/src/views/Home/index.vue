@@ -1,14 +1,17 @@
 <template>
     <div class="dashboard-container">
         <el-card shadow="hover"
-            ><div class="dashboard-text">账号: {{ name }}</div></el-card
+        >
+            <div class="dashboard-text">账号: {{ name }}</div>
+        </el-card
         >
         <el-row>
             <el-col :span="12" v-for="(item, index) in optionList" :key="index">
                 <el-card shadow="hover">
                     <div slot="header" class="clearfix">
                         <span>{{ item.title }}</span>
-                        <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+                        <el-button style="float: right; padding: 3px 0" type="text">操作按钮
+                        </el-button>
                     </div>
                     <core-echarts :chartId="item.id" :option="item.option"></core-echarts>
                 </el-card>
@@ -153,11 +156,13 @@ export default {
     &-container {
         // margin: 30px;
     }
+
     &-text {
         font-size: 30px;
         line-height: 46px;
     }
 }
+
 .chart-1 {
     width: 100%;
     height: 400px;

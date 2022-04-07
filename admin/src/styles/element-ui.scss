@@ -22,6 +22,10 @@
   left: 0;
   position: relative;
   margin: 0 auto;
+  .el-card {
+    max-height: 800px;
+    overflow: auto;
+  }
 }
 
 // refine element ui upload
@@ -82,3 +86,12 @@
   height: 160px;
   display: block;
 }
+.el-table {
+  .el-table__expanded-cell {
+    padding: 5px 10px;
+  }
+}.el-dialog {
+    margin-top: 0 !important;
+    top: 50%;
+    transform: translateY(-50%);
+ }

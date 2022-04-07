@@ -1,8 +1,12 @@
 <template>
-    <div id="backtop" @click="backTop" :class="{'backtop-show': !backTopShow}">
-        <span class="backtop-btn el-icon-upload2"></span>
-        <span class="backtop-border"></span>
-        <span class="backtop-border"></span>
+    <div id="backtop" :class="{'backtop-show': backTopShow}" >
+<!--        <span class="backtop-btn el-icon-upload2"></span>-->
+<!--        <span class="backtop-border"></span>-->
+<!--        <span class="backtop-border"></span>-->
+        <div class="backtop_border animate__animated "  @click="backTop" >
+            <svg-icon icon-class="up" class="up-icon "></svg-icon>
+        </div>
+
     </div>
 </template>
 
@@ -53,8 +57,28 @@ export default {
 #backtop {
     // position: relative;
     cursor: pointer;
-    opacity: 1;
-    transition: all .5s;
+    display: none;
+
+    .backtop_border {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        background-color: rgb(252, 229, 24);
+        border: 1px solid #e0620d;
+        box-shadow: 0 0 20px rgb(252, 229, 24);
+        transition: all 1s;
+        -webkit-transition: all 1s;
+        -moz-transition: all 1s;
+        -ms-transition: all 1s;
+        -o-transition: all 1s;
+
+    }
+    .up-icon {
+        font-size: 24px;
+    }
     .backtop-border {
         -webkit-animation: living 3s linear infinite;
         position: absolute;
@@ -73,7 +97,7 @@ export default {
     }
 }
 .backtop-show {
-    opacity: 0 !important;
+    display: block !important;
 }
 
 #backtop:hover .backtop-btn {

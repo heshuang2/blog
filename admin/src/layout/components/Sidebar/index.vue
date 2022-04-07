@@ -31,10 +31,12 @@ export default {
       'sidebar'
     ]),
     routes() {
+        console.log('路由', this.$router.options.routes);
       return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route
+
       const { meta, path } = route
       // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {

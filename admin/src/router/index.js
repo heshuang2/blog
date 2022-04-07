@@ -108,13 +108,44 @@ export const constantRoutes = [
         ]
     },
     {
+        path: '/link',
+        component: Layout,
+        children: [
+            {
+                path: '',
+                name: '友链管理',
+                component: () => import('@/views/link/LinkList'),
+                meta: {
+                    title: '友链管理',
+                    icon: 'conversation'
+                }
+            }
+        ]
+    },
+    {
+        path: '/music',
+        component: Layout,
+        children: [
+            {
+                path: '',
+                name: '音乐管理',
+                component: () => import('@/views/music/MusicList'),
+                meta: {
+                    title: '音乐管理',
+                    icon: 'conversation'
+                }
+            }
+        ]
+    },
+    {
         path: '/setting',
         component: Layout,
         // redirect: '/example/table',
         name: 'Setting',
         meta: {
             title: '系统设置',
-            icon: 'notebook_1'
+            icon: 'notebook_1',
+            roles: ['administrator', 'admin']
         },
         children: [
             {
@@ -123,7 +154,8 @@ export const constantRoutes = [
                 component: () => import('@/views/setting/AdminUsers'),
                 meta: {
                     title: '系统账号',
-                    icon: 'test'
+                    icon: 'test',
+                    roles: ['admin']
                 }
             },
             {
@@ -132,7 +164,8 @@ export const constantRoutes = [
                 component: () => import('@/views/setting/Users'),
                 meta: {
                     title: '用户账号',
-                    icon: 'test'
+                    icon: 'test',
+                    roles: ['administrator', 'admin']
                 }
             }
         ]
@@ -155,8 +188,12 @@ const createRouter = () =>
     });
 
 const router = createRouter();
+// 异步挂载的路由
+// 动态需要根据权限加载的路由表
+export const asyncRouterMap = [
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
+]
+
 export function resetRouter() {
     const newRouter = createRouter();
     router.matcher = newRouter.matcher; // reset router

@@ -14,7 +14,7 @@
                     <div class="aside-user-name">{{ $store.state.currentUser.name }}</div>
                     <div class="aside-user-content text-grey">
                         账号与资料
-                        <svg-icon iconClass="info-white"></svg-icon>
+                        <svg-icon iconClass="info-black"></svg-icon>
                     </div>
                 </div>
             </div>
@@ -41,16 +41,9 @@
             <div class="aside-group-bar aside-content-bar">
                 <svg-icon iconClass="notify" class="group-icon"></svg-icon>
                 <svg-icon
-                    v-show="this.$store.state.theme === true"
-                    iconClass="night"
+                    :iconClass="this.$store.state.theme ? 'night' : 'daytime'"
                     class="group-icon"
-                    @click="changeTheme(false)"
-                ></svg-icon>
-                <svg-icon
-                    v-show="this.$store.state.theme === false"
-                    iconClass="daytime"
-                    class="group-icon"
-                    @click="changeTheme(true)"
+                    @click="changeTheme(!$store.state.theme)"
                 ></svg-icon>
             </div>
             <div class="aside-content-bar aside-content-btn">
@@ -63,6 +56,7 @@
 
 <script>
 import SvgIcon from '../../SvgIcon/SvgIcon.vue';
+
 export default {
     components: { SvgIcon },
     props: {
@@ -76,13 +70,10 @@ export default {
             imgSrc: require('../../../assets/img/0010.jpg')
         };
     },
-    mounted() {
-        console.log(this.$store.state);
-    },
     methods: {
         toClick(url) {
             let path = this.$route.path;
-            this.$parent.isAsideShow = path == url ? true : false;
+            this.$parent.isAsideShow = path === url;
             setTimeout(() => {
                 this.$router.push(url).catch((err) => {
                     err;
@@ -93,19 +84,36 @@ export default {
             this.$store.commit('dialogStatus', true);
         },
         loginOut() {
-            this.$http2.post('/logout', { account: this.$store.state.currentUser.account }).then((res) => {
+            const _this = this;
+            this.$Dialog.confirm({
+                title: '退出登录',
+                message: '确定退出当前账号吗？',
+                beforeClose
+            })
+            function beforeClose(action, done) {
+                if (action === 'confirm') {
+                    this.$http2.post('/logout', { account: _this.$store.state.currentUser.account }).then((res) => {
+                        _this.$store.dispatch('setUser', null);
+                        window.location.reload();
+                        done();
+                    })
+                } else {
+                    done();
+                }
+            }
+           /* this.$http2.post('/logout', { account: this.$store.state.currentUser.account }).then((res) => {
                 console.log(res);
                 this.$store.dispatch('setUser', null);
                 window.location.reload();
-            });
+            });*/
         },
+
         toUsers() {
             this.$router.push(`/user/${ this.$store.state.isLogin ? this.$store.state.currentUser.account : 123456}`).catch((err) => {err});
             this.$parent.isAsideShow = false;
         },
         changeTheme(_state) {
-            let theme = _state;
-            this.$store.commit('handleTheme', theme);
+            this.$store.commit('handleTheme', _state);
         }
     }
 };

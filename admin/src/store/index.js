@@ -4,6 +4,7 @@ import getters from './getters'
 import app from './modules/app'
 import settings from './modules/settings'
 import user from './modules/user'
+import role from './modules/role'
 
 import createPersistedState from 'vuex-persistedstate';
 
@@ -13,10 +14,19 @@ const store = new Vuex.Store({
     modules: {
         app,
         settings,
-        user
+        user,
+        role
     },
     getters,
-    plugins: [createPersistedState()]
+    plugins: [createPersistedState({
+        storage: window.localStorage,
+        reducer(val) {
+            return {
+                // 只储存state中的assessmentData
+                user: val.user,
+            };
+        }
+    })]
 });
 
 export default store

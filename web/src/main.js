@@ -10,6 +10,8 @@ import './assets/css/meadia.scss';
 import './assets/css/main_h5.scss';
 import request from './network/request';
 import store from './store';
+import animated from 'animate.css' //引入animate动画库
+Vue.use(animated);
 
 import VueTouch from 'vue-touch';
 
@@ -29,6 +31,7 @@ import 'default-passive-events';
 
 import captcha from 'vue-social-captcha';
 Vue.use(captcha);
+
 
 import VueParticles from 'vue-particles';
 Vue.use(VueParticles);

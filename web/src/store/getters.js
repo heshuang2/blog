@@ -11,3 +11,7 @@ export const mobile = state => state.mobile;
 export const articleTitle = state => state.articleTitle;
 export const slideList = state => state.slideList;
 export const theme = state => state.theme;
+export const resetUserId = state => state.resetUserId;
+export const currentMusic = state => state.currentMusic;
+export const playStatus = state => state.playStatus;
+export const isAudioReady = state => state.isAudioReady;

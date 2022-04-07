@@ -1,13 +1,13 @@
 <template>
-    <div class="user-edit-content bg-light">
-        <div class="user-edit-header bg-light">
+    <div class="user-edit-content" :class="$store.state.theme ? 'bg-light text-black' : 'bg-dark text-white'">
+        <div class="user-edit-header">
             <span class="edit-back-card" @click="$parent.isEdit = false">
-                <svg-icon iconClass="back1" class="menu-icon"></svg-icon>
+                <svg-icon :iconClass="$store.state.theme ? 'back1': 'back1-dark'" class="menu-icon"></svg-icon>
             </span>
         </div>
-        <div class="user-edit-body bg-white">
+        <div class="user-edit-body" :class="$store.state.theme ? 'bg-white' : 'bg-black'">
             <div class="user-edit-item font-a">
-                <span class="user-edit-item-left text-black">头像</span>
+                <span class="user-edit-item-left">头像</span>
                 <span class="user-edit-item-right">
                     <span class="text-grey user-edit-item-desc">
                         <img :src="user.avatar" alt="" />
@@ -17,7 +17,7 @@
                 </span>
             </div>
             <div class="user-edit-item font-a">
-                <span class="user-edit-item-left text-black">名字</span>
+                <span class="user-edit-item-left">名字</span>
                 <span class="user-edit-item-right" @click="editItem(user.name, 'name')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.name }}
@@ -26,7 +26,7 @@
                 </span>
             </div>
             <div class="user-edit-item font-a">
-                <span class="user-edit-item-left text-black">个性签名</span>
+                <span class="user-edit-item-left ">个性签名</span>
                 <span class="user-edit-item-right" @click="editItem(user.desc, 'desc')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.desc }}
@@ -35,8 +35,8 @@
                 </span>
             </div>
             <div class="user-edit-item font-a">
-                <span class="user-edit-item-left text-black">邮箱</span>
-                <span class="user-edit-item-right" @click="editItem(user.email, 'email')">
+                <span class="user-edit-item-left">邮箱</span>
+                <span class="user-edit-item-right" >
                     <span class="text-grey user-edit-item-desc">
                         {{ user.email }}
                     </span>
@@ -44,7 +44,7 @@
                 </span>
             </div>
             <div class="user-edit-item font-a">
-                <span class="user-edit-item-left text-black">性别</span>
+                <span class="user-edit-item-left">性别</span>
                 <span class="user-edit-item-right" @click="editPopup('sex')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.sex }}
@@ -53,7 +53,7 @@
                 </span>
             </div>
             <div class="user-edit-item font-a">
-                <span class="user-edit-item-left text-black">年龄</span>
+                <span class="user-edit-item-left">年龄</span>
                 <span class="user-edit-item-right"  @click="editPopup('age')">
                     <span class="text-grey user-edit-item-desc">
                         {{ user.age }}
@@ -62,10 +62,10 @@
                 </span>
             </div>
         </div>
-        <div class="edit-item-group bg-light" :class="isShowEdit ? 'edit-item-show' : 'edit-item-close'">
-            <div class="user-edit-header bg-light">
+        <div class="edit-item-group " :class="[isShowEdit ? 'edit-item-show' : 'edit-item-close', $store.state.theme ? 'bg-light text-black' : 'bg-dark text-white']">
+            <div class="user-edit-header ">
                 <span class="edit-back-card" @click="isShowEdit = false">
-                    <svg-icon iconClass="back1" class="menu-icon"></svg-icon>
+                    <svg-icon :iconClass="$store.state.theme ? 'back1': 'back1-dark'" class="menu-icon"></svg-icon>
                 </span>
                 <span>
                     <van-button
@@ -78,12 +78,13 @@
                     >
                 </span>
             </div>
-            <div class="bg-white edit-item-body">
-                <van-field v-model="value" clearable />
+            <div class="edit-item-body"  >
+                <van-field v-model="value" clearable  />
             </div>
             <van-popup v-model="isSex" round position="bottom">
                 <van-picker
                     show-toolbar
+                    :class="$store.state.theme ? 'bg-light text-black' : 'bg-dark text-white'"
                     :columns="columns"
                     :default-index="sexIndex"
                     @cancel="onCancel"
@@ -123,7 +124,7 @@ export default {
             this.value = value;
         },
         saveUserItem() {
-            if (this.value != '') {
+            if (this.value !== '') {
                 this.user[this.key] = this.value;
                 const toast = this.$Toast.loading({
                     duration: 0
@@ -163,7 +164,6 @@ export default {
     right: -100%;
     width: 100%;
     height: 100%;
-    z-index: 9;
     // color: #fff;/
     transition: all 0.3s linear;
     z-index: 1000;
@@ -275,6 +275,12 @@ export default {
         opacity: 0.1;
         border-radius: 8px;
     }
+    .van-picker-column__item {
+        color: inherit;
+    }
+    .van-picker__mask {
+        background-image: none;
+    }
 }
 .edit-content-show {
     right: 0;
@@ -284,4 +290,5 @@ export default {
     // animation: slide-right 0.3s;
     right: -100%;
 }
+
 </style>

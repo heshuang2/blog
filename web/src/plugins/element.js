@@ -27,7 +27,10 @@ import {
     InputNumber,
     Tabs,
     TabPane,
-    MessageBox
+    MessageBox,
+    Row,
+    Col,
+    Progress
 } from 'element-ui';
 
 Vue.use(Menu);
@@ -55,6 +58,9 @@ Vue.use(RadioButton),
 Vue.use(InputNumber),
 Vue.use(Tabs),
 Vue.use(TabPane),
+Vue.use(Row),
+Vue.use(Col),
+Vue.use(Progress),
 Vue.prototype.$notify = Notification;
 Vue.prototype.$message = Message;
 Vue.prototype.$MessageBox = MessageBox;

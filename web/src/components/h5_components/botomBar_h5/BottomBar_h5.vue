@@ -28,6 +28,7 @@
 
 <script>
 import MessageBoard from '../../messageCom/MessageBoard.vue';
+
 export default {
     components: { MessageBoard },
     props: {
@@ -54,8 +55,7 @@ export default {
     watch: {},
     methods: {
         toMessage() {
-            let height = document.querySelector('.comment-title').offsetTop;
-            document.documentElement.scrollTop = height;
+            document.documentElement.scrollTop = document.querySelector('.comment-title').offsetTop;
         },
         messageShow() {
             this.show = true;
@@ -100,6 +100,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    z-index: 9;
     .bottom-input {
         width: 50%;
         height: 2rem;

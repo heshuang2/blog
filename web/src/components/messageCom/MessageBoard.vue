@@ -1,6 +1,7 @@
 <template>
     <div class="comment-wrap">
-        <div class="err-tip fs-sm" :class="{ tipOver: isTip }">你还没有{{ this.article ? '评论' : '留言' }}</div>
+        <div v-if="$store.state.isLogin" class="err-tip fs-sm" :class="{ tipOver: isTip }">你还没有{{ this.article ? '评论' : '留言' }}</div>
+        <div v-else class="err-tip fs-sm" :class="{ tipOver: isTip }">请先登录</div>
         <div class="comment-input">
             <div v-if="!this.$store.state.isLogin" class="mask">
                 <div>请先<dialog-btn />(・ω・)</div>
@@ -8,7 +9,7 @@
             <div class="vpanel">
                 <div class="avatar" v-if="!this.$store.state.mobile">
                     <img v-if="this.$store.state.currentUser" :src="this.userMessage.user.avatar" alt="" />
-                    <img v-else src="../../assets/img/0011.jpeg" alt="" />
+                    <img v-else src="../../assets/img/avatar.jpeg" alt="" />
                 </div>
                 <div class="vheader">
                     <textarea
@@ -109,7 +110,7 @@ export default {
     mounted() {
         this.loadEmotion();
         document.addEventListener('click', () => {
-            if (this.isEmotion == false) {
+            if (this.isEmotion === false) {
                 this.isEmotion = true;
             }
         });
@@ -138,17 +139,19 @@ export default {
             this.emotionArr = emotionArr;
         },
         async toComment(index) {
-            if (this.userMessage.message != '') {
+            if (this.userMessage.message !== '') {
                 this.userMessage.datetime = new Date();
-                // console.log(this.article);
+                console.log( this.userMessage);
+                this.userMessage.isDrop = this.userMessage.isDrop !== undefined ? this.userMessage.isDrop : true;
                 if (this.article) {
                     this.userMessage.article._id = this.article._id;
                     this.userMessage.article.title = this.article.title;
-                    const { data: res } = await this.$http2.post(`/rest/comments`, this.userMessage);
-                    this.$bus.$emit('getArticleComment', 1, this.messageLists.length, 2, index, this.item);
+                    const { data: res } = await this.$http2.post(`/rest/comments`, this.userMessage);;
+                    this.$bus.$emit('getArticleComment', 1, this.messageLists.length);
                 } else {
                     const { data: res } = await this.$http2.post('/rest/messages', this.userMessage);
-                    this.$bus.$emit('getMessageList', 1, this.messageLists.length, 2, index, this.item);
+                    console.log(res);
+                    this.$bus.$emit('getMessageList', 1, this.messageLists.length);
                 }
                 this.userMessage.message = '';
                 this.errMsg = false;
@@ -175,7 +178,7 @@ export default {
     position: relative;
     .comment-input {
         position: relative;
-        height: 140px;
+        height: 160px;
         width: 100%;
         box-sizing: border-box;
         padding: 5px;
@@ -195,8 +198,7 @@ export default {
         border-radius: 8px;
         button {
             height: 24px;
-            width: 60px;
-            line-height: 50%;
+            padding: .5rem 1rem;
             font-size: 16px;
             border: none;
             border-radius: 5px;

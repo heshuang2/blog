@@ -22,7 +22,11 @@ const store = new Vuex.Store({
         mobile: false,
         articleTitle: '',
         slideList: [],
-        theme: false
+        theme: true,
+        resetUserId:　'', //获取重置密码的账号id
+        currentMusic: {}, //当前播放的音乐
+        playStatus: 'pause', //播放状态
+        isAudioReady: false, //判断audio是否可以播放
     },
     getters,
     mutations,

@@ -1,5 +1,5 @@
 {
-  "name": "smallrailwaystation",
+  "name": "hxug",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@moefe/vue-aplayer": "^2.0.0-beta.5",
+    "animate.css": "^4.1.1",
     "axios": "^0.21.0",
     "clipboard": "^2.0.6",
     "core-js": "^3.6.5",

@@ -1,17 +1,17 @@
 <template>
     <div id="message">
-        <div class="container message-main">
-            <div v-if="!this.$store.state.mobile" class="page bg-white">
-                <hr v-if="!this.$store.state.mobile" />
+        <div class="container message-main" :class="$store.state.theme ? 'bg-light' :'bg-dark text-white'">
+            <div v-if="!this.$store.state.mobile" class="page ">
+                <hr v-if="!this.$store.state.mobile"/>
                 <div class="post-comment">
                     <div class="comment-head">
                         <div class="comment-headline">
-                            <svg-icon icon-class="iview" class="article-icon" />
+                            <svg-icon icon-class="iview" class="article-icon"/>
                             <span>留下足迹吧</span>
                         </div>
                     </div>
                     <div class="message-board">
-                        <message-board :messageLists="messageLists"></message-board>
+                        <message-board></message-board>
                         <message-list ref="messageList" :messageLists="messageLists" :count="count"></message-list>
                     </div>
                 </div>
@@ -31,6 +31,7 @@ import SvgIcon from '../components/SvgIcon/SvgIcon.vue';
 import MessageList from '../components/messageCom/MessageList.vue';
 import BottomBarH5 from '../components/h5_components/botomBar_h5/BottomBar_h5.vue';
 import MessageListH5 from '../components/h5_components/messageList_h5/MessageList_h5.vue';
+
 export default {
     components: { MessageList, MessageBoard, SvgIcon, BottomBarH5, MessageListH5 },
     data() {
@@ -49,8 +50,8 @@ export default {
         this.$bus.$on('getMessageList', this.getMessageList);
     },
     methods: {
-        async getMessageList(num, limit, key, index, item) {
-            const { data: res } = await this.$http2.get('rest/messages/', {
+        getMessageList(num, limit) {
+            this.$http2.get('rest/messages/', {
                 params: {
                     skip: num,
                     limit: limit
@@ -58,82 +59,20 @@ export default {
                 paramsSerializer: (params) => {
                     return this.$qs.stringify(params, { indices: false });
                 }
-            });
-            this.utils.IsDel(res.data, this);
-            this.count = res.count;
-            switch (key) {
-                case 1:
-                    this.$refs.messageList.isLoad = true;
-                    this.messageLists = this.messageLists.concat(res.data);
-                    break;
-                case 2:
-                    let flag1,
-                        flag2 = false;
-                    // 新增删除留言评论处理展开回复状态
-                    switch (res.data.length - this.messageLists.length) {
-                        case 1:
-                            item = null;
-                            flag1 = true;
-                            break;
-                        case -1:
-                            item = null;
-                            flag2 = true;
-                            break;
-                        default:
-                            break;
-                    }
-                    this.messageLists = res.data;
-                    if (flag1) {
-                        this.$nextTick(() => {
-                            console.log(this.$store.state.slideList);
-                            this.$store.state.slideList.forEach((key, index) => {
-                                this.$store.state.slideList[index] = key + 1;
-                                this.messageLists[key + 1].isDrop = false;
-                                this.$bus.$emit('clearLeave', key);
-                                this.$bus.$emit('slideEnter', key + 1);
-                            });
-                            console.log(this.$store.state.slideList);
-                            flag1 = false;
-                        });
-                    }
-                    if (flag2) {
-                        this.$nextTick(() => {
-                            console.log(index);
-                            this.$bus.$emit('slideLeave', index);
-                            console.log(this.$store.state.slideList);
-                            this.$store.state.slideList.forEach((key, i) => {
-                                // console.log(this.$store.state.slideList);
-                                if (key > index) {
-                                    this.$store.state.slideList[i] = key - 1;
-                                    this.messageLists[key - 1].isDrop = false;
-                                    this.$bus.$emit('clearLeave', key);
-                                    this.$bus.$emit('slideEnter', key - 1);
-                                } else {
-                                    console.log(key);
-                                    this.messageLists[key].isDrop = false;
-                                    this.$bus.$emit('slideEnter', key);
-                                }
-                            });
-                            console.log(this.$store.state.slideList);
-                            index = null;
-                            flag2 = false;
-                        });
-                    }
-                    break;
-                default:
-                    this.messageLists = this.messageLists.concat(res.data);
-            }
-            if (index != null) {
-                this.messageLists[index].isDrop = false;
-            }
-            if (this.$store.state.mobile && item) {
+            }).then( res => {
+                this.utils.IsDel(res.data.data, this);
+                this.count = res.data.count;
+                this.messageLists = num !== 1 ? this.messageLists.concat(res.data.data) : res.data.data
                 this.$nextTick(() => {
-                    this.$store.state.slideList.forEach((key) => {
-                        this.messageLists[key].isDrop = false;
+                    this.messageLists.forEach((item, key) => {
+                        if (!item.isDrop) {
+                            this.$bus.$emit('slideEnter', key, item, 0);
+                        } else {
+                            this.$bus.$emit('clearLeave', key);
+                        }
                     });
-                    this.$bus.$emit('slideEnter', index, item);
                 });
-            }
+            })
         }
     }
 };
@@ -153,14 +92,17 @@ export default {
         display: block !important;
         padding-top: 60px;
     }
+
     hr {
         width: calc(100% - 4px);
         border: 2px dashed;
         margin: 2rem auto;
     }
+
     .post-comment {
         .comment-head {
             margin-bottom: 1rem;
+
             .comment-headline {
                 display: inline-block;
                 vertical-align: middle;
@@ -168,14 +110,17 @@ export default {
                 font-size: 1.43em;
             }
         }
+
         .message-board {
             border: 1px solid #f0f0f0;
             border-radius: 5px;
             padding: 20px 10px;
         }
+
         .comment-list {
             padding-top: 20px;
             position: relative;
+
             .list-item {
                 .user-face {
                     float: left;
@@ -184,6 +129,7 @@ export default {
                     .user-avatar {
                         width: 48px;
                         height: 48px;
+
                         img {
                             width: 48px;
                             height: 48px;
@@ -192,11 +138,13 @@ export default {
                         }
                     }
                 }
+
                 .user-content {
                     position: relative;
                     margin-left: 85px;
                     padding: 22px 0 14px 0;
                     border-top: 1px solid #e5e9ef;
+
                     .user-name {
                         font-size: 12px;
                         font-weight: bold;
@@ -205,6 +153,7 @@ export default {
                         display: block;
                         word-wrap: break-word;
                         position: relative;
+
                         a {
                             color: #fb7299 !important;
                             outline: none;
@@ -212,6 +161,7 @@ export default {
                             cursor: pointer;
                         }
                     }
+
                     .user-text {
                         line-height: 20px;
                         padding: 2px 0;
@@ -224,6 +174,7 @@ export default {
                         display: flex;
                         justify-content: space-between;
                     }
+
                     .user-info {
                         color: #99a2aa;
                         line-height: 26px;
@@ -231,6 +182,7 @@ export default {
                         display: flex;
                         justify-content: space-between;
                         border-bottom: 1px dashed #e5e9ef;
+
                         .reply {
                             padding: 0 5px;
                             border-radius: 4px;
@@ -238,22 +190,27 @@ export default {
                             cursor: pointer;
                             display: inline-block;
                         }
+
                         .reply:hover {
                             color: #00a1d6;
                             background: #e5e9ef;
                         }
+
                         .more {
                             display: none;
                         }
                     }
+
                     .reply-box {
                         .reply-item {
                             padding: 10px 0;
+
                             .reply-face {
                                 display: inline-block;
                                 position: relative;
                                 margin-right: 10px;
                                 vertical-align: top;
+
                                 img {
                                     width: 32px;
                                     height: 32px;
@@ -261,9 +218,11 @@ export default {
                                     object-fit: cover;
                                 }
                             }
+
                             .reply-con {
                                 display: inline-block;
                                 width: calc(100% - 42px);
+
                                 .reply-user {
                                     font-size: 12px;
                                     font-weight: bold;
@@ -272,6 +231,7 @@ export default {
                                     display: block;
                                     word-wrap: break-word;
                                     position: relative;
+
                                     .reply-userInfo {
                                         a {
                                             outline: none;
@@ -281,11 +241,13 @@ export default {
                                             padding: 0 5px;
                                         }
                                     }
+
                                     .reply-name {
                                         position: relative;
                                         color: #6d757a;
                                         padding-right: 10px;
                                     }
+
                                     .reply-text {
                                         font-weight: normal;
                                         font-size: 14px;
@@ -297,13 +259,16 @@ export default {
                             }
                         }
                     }
+
                     .reply-box:hover {
                         .more {
                             display: block;
                         }
                     }
+
                     .close {
                         display: flex;
+
                         .close-reply {
                             cursor: pointer;
                             margin-left: auto;

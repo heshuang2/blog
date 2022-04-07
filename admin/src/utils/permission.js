@@ -1,4 +1,5 @@
 import router from '../router';
+import store from '../store';
 import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 
@@ -7,6 +8,10 @@ NProgress.configure({ showSpinner: false }); // NProgress Configuration
 router.beforeEach((to, from, next) => {
     if (!to.meta.isPublic && !localStorage.token) {
         return next('/login');
+    }else {
+        if (store.state.role.role_name === '') {
+
+        }
     };
     if (to.path === '/login' && localStorage.token) {
         return next(from.path);

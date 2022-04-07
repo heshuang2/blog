@@ -4,7 +4,7 @@
             <div class="user-face">
                 <router-link :to="`/user/${item.user.account}`">
                     <div class="user-avatar">
-                        <img :src="item.user.avatar" alt="" />
+                        <img :src="item.user.avatar" alt=""/>
                     </div>
                 </router-link>
             </div>
@@ -21,66 +21,70 @@
                 <div class="user-info">
                     <span>
                         <span class="time">{{ item.datetime | playTimeFormat }}</span>
-                        <span class="reply" @click="replyBtn(index, item._id, item.user, 1)">回复</span>
+                        <span class="reply" @click="replyBtn(index, item._id, item, 0)">回复</span>
                     </span>
                     <span v-if="item.isDel" class="reply" @click="delReply(item)">删除</span>
                 </div>
-                <div class="reply-content" v-if="item.children.length != 0" v-show="item.isDrop == true">
-                    <span class="reply content-btn" @click="item.isDrop = false"
-                        ><svg-icon iconClass="drop-down" class="reply-icon"></svg-icon>展开{{
+                <div class="reply-content" v-if="item.children.length !== 0">
+                    <span class="reply content-btn" :class="
+                            !item.isDrop ? 'btn-none' : 'btn-show'" @click="slideEnter(index, item)"
+                    ><svg-icon iconClass="drop-down" class="reply-icon"></svg-icon>展开{{
                             item.children.length
                         }}条回复</span
                     >
                 </div>
-                <div class="reply-content reply-down" v-if="item.children.length != 0" v-show="item.isDrop == false">
-                    <div class="reply-box" v-if="item.children" v-for="(itemChild, i) in item.children" :key="i">
+                <div ref="reply" class="reply-content-main">
+                    <div class="reply-box" v-for="(itemChild, i) in item.children" :key="i">
                         <div class="reply-item">
                             <router-link :to="`/user/${itemChild.user.account}`" class="reply-face">
-                                <img :src="itemChild.user.avatar" alt="" />
+                                <img :src="itemChild.user.avatar" alt=""/>
                             </router-link>
                             <div class="reply-con">
                                 <div class="reply-user">
                                     <a class="reply-name">{{ itemChild.user.name }}</a>
                                     <span class="reply-userInfo" v-if="itemChild.isReply == 1"
-                                        >回复<a href="">@{{ itemChild.userInfo.name }}</a></span
+                                    >回复<a href="">@{{ itemChild.userInfo.name }}</a></span
                                     >
                                     <span class="reply-text" v-html="utils.Emoji(itemChild.message)"></span>
                                 </div>
                                 <div class="user-info">
                                     <span>
                                         <span class="time">{{ itemChild.datetime | playTimeFormat }}</span>
-                                        <span class="reply" @click="replyBtn(index, item._id, itemChild.user)"
-                                            >回复</span
+                                        <span class="reply" @click="replyBtn(index, item._id, itemChild, 1)"
+                                        >回复</span
                                         >
                                     </span>
                                     <span
                                         v-if="itemChild.isDel"
                                         class="reply more"
                                         @click="delReply(itemChild, item.article, index)"
-                                        >删除</span
+                                    >删除</span
                                     >
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <span class="reply content-btn" @click="item.isDrop = true"
+                    <div class="reply-content">
+                        <span class="reply content-btn" @click="slideLeave(index, item)"
                         ><svg-icon iconClass="pack-up" class="reply-icon"></svg-icon>收起</span
-                    >
+                        >
+                    </div>
                 </div>
-                <div v-show="isReply == index">
+                <div v-show="isReply === index">
                     <div class="close">
                         <svg-icon iconClass="close" class="close-reply" @click="closeReply(index)"></svg-icon>
                     </div>
                     <message-board
                         ref="replyBoard"
                         :article="article"
-                        :messageLists="messageLists"
                         :itemMsg="index"
+                        :item="item"
                     ></message-board>
                 </div>
             </div>
         </div>
-        <div v-if="messageLists.length < count" class="list-loader" ref="loader" @click="loaderComments">
+        <div v-if="messageLists.length < count" class="list-loader"
+             :class="$store.state.theme ? 'bg-white' : 'bg-black'" ref="loader" @click="loaderComments">
             <span v-if="isLoad">加载更多...</span>
             <span v-else>
                 <i class="el-icon-loading"></i>
@@ -96,6 +100,7 @@
 <script>
 import SvgIcon from '../SvgIcon/SvgIcon.vue';
 import MessageBoard from './MessageBoard.vue';
+
 export default {
     name: 'MessageList',
     components: { SvgIcon, MessageBoard },
@@ -119,21 +124,63 @@ export default {
             isReply: -1,
             user: this.$store.state.currentUser,
             isLoad: true,
-            isDrop: true
+            isDrop: true,
+            item: {}
         };
     },
+    mounted() {
+        this.$bus.$on('slideEnter', this.slideEnter);
+        this.$bus.$on('slideLeave', this.slideLeave);
+        this.$bus.$on('clearLeave', this.clearLeave);
+    },
+
     methods: {
+        slideEnter(index, item) {
+            //   this.$store.commit('HandleSlideList', index);
+            //    console.log( this.$store.state.slideList);
+            item.isDrop = false;
+            this.$store.commit('HandleSlideList', item);
+            const el = this.$refs.reply[index];
+            if (el) {
+                el.style.height = 'auto';
+                let height = window.getComputedStyle(el, null)['height'];
+                el.style.height = '0';
+                //不设定延迟height不会有动画
+                setTimeout(function() {
+                    el.style.height = height;
+                    el.style.opacity = 1;
+                }, 20);
+            }
+        },
+        slideLeave(index, item) {
+            this.$store.commit('RemoveSlideList', item);
+            const el = this.$refs.reply[index];
+            el.style.height = '0';
+            setTimeout(function() {
+                item.isDrop = true;
+                // console.log('移除', this.$store.state.slideList);
+            }.bind(this), 300);
+        },
+        clearLeave(index) {
+            const el = this.$refs.reply[index];
+            if (el) {
+                el.style.height = '0';
+            }
+        },
+
         replyBtn(index, id, data, key) {
+            this.item = data;
             this.isReply = index;
-            this.$refs.replyBoard[index].userMessage.userInfo.name = '@' + data.name;
-            this.$refs.replyBoard[index].userMessage.userInfo.id = data._id;
+            this.$refs.replyBoard[index].userMessage.userInfo.name = '@' + data.user.name;
+            this.$refs.replyBoard[index].userMessage.userInfo.id = data.user._id;
             this.$refs.replyBoard[index].userMessage.infoId = id;
-            this.$refs.replyBoard[index].userMessage.isReply = key ? 0 : 1;
+            this.$refs.replyBoard[index].userMessage.isReply = key;
         },
         closeReply(index) {
             this.isReply = -1;
             this.$refs.replyBoard[index].errMsg = false;
         },
+        //删除
         delReply(item, parent, index) {
             this.$MessageBox
                 .confirm(
@@ -151,11 +198,10 @@ export default {
                     });
                     if (item.article || parent) {
                         const { data: res } = await this.$http2.delete(`rest/comments/${item._id}/${item.infoId}`);
-                        this.$bus.$emit('getArticleComment', 1, this.messageLists.length, 2, index);
+                        this.$bus.$emit('getArticleComment', 1, this.messageLists.length);
                     } else {
-                        console.log(1);
                         const { data: res } = await this.$http2.delete(`rest/messages/${item._id}/${item.infoId}`);
-                        this.$bus.$emit('getMessageList', 1, this.messageLists.length, 2, index);
+                        this.$bus.$emit('getMessageList', 1, this.messageLists.length, true);
                     }
                 })
                 .catch(() => {
@@ -175,9 +221,8 @@ export default {
                     5,
                     1
                 );
-                this.$bus.$on('isLoad', function () {
+                this.$bus.$on('isLoad', function() {
                     this.isLoad = true;
-                    console.log(1);
                 });
             }, 1000);
         }
@@ -189,8 +234,10 @@ export default {
 .comment-list {
     padding-top: 20px;
     position: relative;
+
     .list-item {
         animation: moveup 1s;
+
         .user-face {
             float: left;
             margin: 24px 0 0 5px;
@@ -198,6 +245,7 @@ export default {
             .user-avatar {
                 width: 48px;
                 height: 48px;
+
                 img {
                     width: 48px;
                     height: 48px;
@@ -206,11 +254,13 @@ export default {
                 }
             }
         }
+
         .user-content {
             position: relative;
             margin-left: 85px;
             padding: 22px 0 14px 0;
             border-top: 1px solid #e5e9ef;
+
             .user-name {
                 font-size: 12px;
                 font-weight: bold;
@@ -219,6 +269,7 @@ export default {
                 display: block;
                 word-wrap: break-word;
                 position: relative;
+
                 a {
                     color: #fb7299 !important;
                     outline: none;
@@ -226,6 +277,7 @@ export default {
                     cursor: pointer;
                 }
             }
+
             .user-text {
                 line-height: 20px;
                 padding: 2px 0;
@@ -238,6 +290,7 @@ export default {
                 display: flex;
                 justify-content: space-between;
             }
+
             .user-info {
                 color: #99a2aa;
                 line-height: 26px;
@@ -245,10 +298,12 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 border-bottom: 1px dashed #e5e9ef;
+
                 .more {
                     display: none;
                 }
             }
+
             .reply {
                 padding: 0 5px;
                 border-radius: 4px;
@@ -256,26 +311,31 @@ export default {
                 cursor: pointer;
                 display: inline-block;
             }
+
             .reply:hover {
                 color: #00a1d6;
                 background: #e5e9ef;
             }
+
             .reply-down {
                 animation: slide-down 0.5s;
                 transform-origin: 50% 0;
             }
+
             .reply-content {
                 padding: 10px 0;
                 position: relative;
-                opacity: 1;
-                translate: all 0.3s;
+
                 .content-btn {
+                    height: auto;
+                    width: auto;
                     font-size: 11px;
                     font-weight: 600;
                     color: #6d757a;
-                    font-family: HelveticaNeue-Bold, HelveticaNeue;
+                    font-family: HelveticaNeue-Bold, HelveticaNeue, serif;
                     letter-spacing: 1px;
                     margin-left: 0;
+
                     .reply-icon {
                         font-size: 20px;
                         padding-right: 10px;
@@ -283,18 +343,29 @@ export default {
                     }
                 }
             }
+
+            .reply-content-main {
+                position: relative;
+                transition: height 0.3s linear;
+                height: 0;
+                overflow: hidden;
+            }
+
             .reply-drop {
                 position: absolute;
                 translate: all 0.3s;
             }
+
             .reply-box {
                 .reply-item {
                     padding: 10px 0;
+
                     .reply-face {
                         display: inline-block;
                         position: relative;
                         margin-right: 10px;
                         vertical-align: top;
+
                         img {
                             width: 32px;
                             height: 32px;
@@ -302,9 +373,11 @@ export default {
                             object-fit: cover;
                         }
                     }
+
                     .reply-con {
                         display: inline-block;
                         width: calc(100% - 42px);
+
                         .reply-user {
                             font-size: 12px;
                             font-weight: bold;
@@ -313,6 +386,7 @@ export default {
                             display: block;
                             word-wrap: break-word;
                             position: relative;
+
                             .reply-userInfo {
                                 a {
                                     outline: none;
@@ -322,11 +396,13 @@ export default {
                                     padding: 0 5px;
                                 }
                             }
+
                             .reply-name {
                                 position: relative;
                                 color: #6d757a;
                                 padding-right: 10px;
                             }
+
                             .reply-text {
                                 font-weight: normal;
                                 font-size: 14px;
@@ -338,13 +414,16 @@ export default {
                     }
                 }
             }
+
             .reply-box:hover {
                 .more {
                     display: block;
                 }
             }
+
             .close {
                 display: flex;
+
                 .close-reply {
                     cursor: pointer;
                     margin-left: auto;
@@ -353,17 +432,18 @@ export default {
             }
         }
     }
+
     .list-loader {
         margin-top: 50px;
         height: 42px;
         font: 16px PingFangSC-Regular;
         text-align: center;
         line-height: 42px;
-        color: #626675;
-        background: #f5f5f6;
+
         border-radius: 6px;
         cursor: pointer;
     }
+
     .list-null {
         text-align: center;
         border-top: 1px solid #ccc;
@@ -371,6 +451,19 @@ export default {
         margin-top: 20px;
         font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif !important;
         font-size: 15px;
+    }
+
+    .btn-none {
+        // display: none;
+        position: absolute;
+        opacity: 0;
+        // transition: all .2s linear;
+    }
+
+    .btn-show {
+        // display: block;
+        opacity: 1;
+        transition: all 0.5s linear;
     }
 }
 </style>

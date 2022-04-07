@@ -48,6 +48,10 @@ export default {
             }
         };
     },
+    activated() {
+        console.log(this.swiperOption.loop);
+        this.swiperOption.loop = true;
+    },
     components: {
         swiper,
         swiperSlide
@@ -63,6 +67,7 @@ export default {
     methods: {
         async getArticleList() {
             const { data: res } = await this.$http2.get('/rest/articles');
+            // console.log(res);
             // 洗牌随机获取3篇文章
             this.items = this.utils.randSolt(res.data, 3);
         },
